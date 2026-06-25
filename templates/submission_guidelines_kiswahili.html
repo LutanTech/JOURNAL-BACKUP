@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a href="{{ url_for('about') }}">About the Journal</a>
+<span>/</span>
+<a>Mwongozo wa Uwasilishaji</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Wito wa Makala • Toleo la Kwanza</span>
+    <h2>Tunu Journal: Kiswahili Studies</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Mwongozo rasmi na masharti ya uwasilishaji wa makala ya utafiti kwa ajili ya Toleo la 1 (Septemba 2026).</p>
+</div>
+
+<div class="article-view-layout">
+    <div class="article-full-content">
+        <div class="article-body-text">
+            
+            <div style="background: rgba(197, 160, 89, 0.08); border-left: 4px solid var(--gold); padding: 20px; border-radius: 0 4px 4px 0; margin-bottom: 30px;">
+                <h3 style="margin-top: 0; color: var(--accent);"><i class="fas fa-info-circle"></i> Lahusu Nini?</h3>
+                <p style="margin-bottom: 0; line-height: 1.7;">
+                    <strong>Tunu Journal (Kiswahili Studies)</strong> ni jarida linalochapisha makala yanayohusu Isimu na Fasihi ya Lugha ya Kiswahili. Wahariri wakuu wanawatangazia wanataaluma kwamba wanapokea makala kwa ajili ya toleo la 1 litakalochapishwa Septemba 2026.
+                </p>
+            </div>
+
+            <h3>1. Lugha na Maudhui</h3>
+            <p>Ili makala yakubaliwe kwa ajili ya tathmini ya kitaalamu (peer-review), lazima yazingatie vigezo vifuatavyo vya lugha na maudhui:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Maudhui ya Kitaaluma:</strong> Makala yatakayokubaliwa ni yale tu yanayojikita katika taaluma za Kiswahili (Isimu, Fasihi, Uhakiki, au Uhifadhi wa lugha).</li>
+                <li style="margin-bottom: 10px;"><strong>Lugha Sanifu:</strong> Makala yote yaandikwe katika Kiswahili sanifu na fasaha.</li>
+                <li style="margin-bottom: 10px;"><strong>Makala ya Kiingereza:</strong> Makala yaliyoandikwa kwa lugha ya Kiingereza pia yatapokelewa, yakifanyiwa tathmini na kisha kutafsiriwa katika Kiswahili kabla ya kuchapishwa rasmi.</li>
+            </ul>
+
+            <h3>2. Muundo wa Makala</h3>
+            <p>Waandishi wanapaswa kuandaa miswada yao kwa kufuata vipimo vya kiufundi vilivyoainishwa hapa chini:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Programu:</strong> Makala yaandikwe kwa kutumia programu ya <em>Microsoft Word</em> (.doc au .docx).</li>
+                <li style="margin-bottom: 10px;"><strong>Fonti:</strong> Fonti inayokubalika ni <em>Times New Roman</em> pekee.</li>
+                <li style="margin-bottom: 10px;"><strong>Nafasi:</strong> Nafasi kati ya mistari iwe 1.5 (Line spacing 1.5).</li>
+                <li style="margin-bottom: 10px;"><strong>Ikisiri (Abstract):</strong> Kila makala lazima yaambatane na Ikisiri yenye urefu wa maneno kati ya <strong>200 na 250</strong>.</li>
+                <li style="margin-bottom: 10px;"><strong>Urefu wa Makala:</strong> Makala kamili yawe na urefu wa maneno kati ya <strong>5,000 na 8,000</strong> (pamoja na marejeo).</li>
+            </ul>
+
+            <h3>3. Marejeo na Tiniwayo</h3>
+            <p>Uzingatiaji mkali wa maadili ya kitaaluma na uandishi wa vyanzo unahitajika:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Mfumo wa Urejeleaji:</strong> Marejeo yote yaandikwe kwa kufuata mwongozo wa <strong>APA (American Psychological Association) toleo la 6</strong>.</li>
+                <li style="margin-bottom: 10px;"><strong>Tiniwayo (Footnotes):</strong> Tiniwayo zitumike tu pale inapolazimu na kwa kiwango cha chini kabisa.</li>
+            </ul>
+
+            <h3>4. Taarifa za Mwandishi</h3>
+            <p>Katika ukurasa wa kwanza wa mswada wako, hakikisha umeonyesha taarifa zifuatazo kwa usahihi:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-heading" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Anwani ya Makala</h5>
+                </div>
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-user" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Jina la Mwandishi</h5>
+                </div>
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-university" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Taasisi ya Kielimu</h5>
+                </div>
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-envelope" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Baruapepe & Simu</h5>
+                </div>
+            </div>
+
+            <h3>5. Utaratibu wa Kutuma & Makataa</h3>
+            <p>Miswada yote inapaswa kuwasilishwa kwa njia ya kielektroniki:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Baruapepe ya Uwasilishaji:</strong> Tuma makala yako kupitia anuani rasmi: <a href="mailto:tunujournal@gmail.com" style="color: var(--accent); font-weight: bold;">tunujournal@gmail.com</a>.</li>
+                <li style="margin-bottom: 10px;"><strong>Makataa ya Kutuma (Deadline):</strong> Mwisho wa kupokea makala ni tarehe **30 Julai 2026**.</li>
+            </ul>
+
+        </div>
+    </div>
+
+    <!-- Right Sidebar with Flyer and Contacts -->
+    <div class="article-sidebar">
+        
+        <!-- Official Call For Papers Flyer Reference -->
+        <div class="sidebar-widget" style="padding: 15px;">
+            <h4>Tangazo Rasmi la Wito</h4>
+            <div style="border: 1px solid var(--border); border-radius: 4px; overflow: hidden; background: #000; position: relative;">
+                <img src="{{ url_for('static', filename='image_1559c8.jpg') }}" alt="Wito wa Makala - Tunu Journal Kiswahili Studies" style="width: 100%; display: block; height: auto; opacity: 0.95; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+            </div>
+            <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 10px; font-style: italic; text-align: center; line-height: 1.4;">
+                Bofya picha hapo juu ili kuona bango rasmi la wito wa makala (Toleo la 1, Juni 2026).
+            </p>
+        </div>
+
+        <!-- Editorial Contacts -->
+        <div class="sidebar-widget">
+            <h4>Wahariri Wakuu</h4>
+            <p style="font-size: 0.9rem; margin-bottom: 8px; line-height: 1.5;">
+                <strong>Bw. Timothy Omusikoyo Sumba</strong><br>
+                <span style="opacity: 0.75; font-size: 0.8rem;">Mhariri Mkuu</span>
+            </p>
+            <p style="font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                <strong>Dkt. Evans Kiplimo</strong><br>
+                <span style="opacity: 0.75; font-size: 0.8rem;">Mhariri Mshiriki</span>
+            </p>
+            
+            <h4 style="margin-top: 25px;">Wasiliana Nasi</h4>
+            <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px;">
+                <i class="fas fa-phone-alt" style="color: var(--gold); margin-right: 8px;"></i> +254 722 682 129<br>
+                <i class="fas fa-phone-alt" style="color: var(--gold); margin-right: 8px;"></i> +254 795 689 523
+            </p>
+            <p style="font-size: 0.85rem; line-height: 1.6;">
+                <i class="fas fa-globe" style="color: var(--gold); margin-right: 8px;"></i> <a href="http://www.tunujournal.com" target="_blank" style="color: inherit; text-decoration: none;">www.tunujournal.com</a><br>
+                <i class="fas fa-envelope" style="color: var(--gold); margin-right: 8px;"></i> <a href="mailto:tunujournal@gmail.com" style="color: inherit; text-decoration: none;">tunujournal@gmail.com</a>
+            </p>
+        </div>
+
+        <!-- Archival License -->
+        <div class="sidebar-widget">
+            <h4>Hatimiliki ya Jarida</h4>
+            <p style="font-size: 0.8rem; line-height: 1.4; opacity: 0.8; margin-bottom: 0;">
+                Kazi zote zilizochapishwa hapa zinalindwa chini ya leseni ya Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0).
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -616,9 +616,25 @@ def admin_delete_article(article_id):
     db.session.commit()
     return redirect(url_for('admin_portal'))
 
+@app.route("/submission-guidelines/kiswahili")
+def submission_guidelines_swa():
+    return render_template("submission_guidelines_kiswahili.html")
+
+
+@app.route("/submission-guidelines/kiswahili")
+def submission_guidelines_edu():
+    return render_template("submission_guidelines_education.html")
+
+
+@app.route("/submission-guidelines/kiswahili")
+def submission_guidelines():
+    return render_template("submission_guidelines_education.html")
+
+
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
     print("app.run(debug=True)")
+    app.run(debug=True)

@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a href="{{ url_for('about') }}">About the Journal</a>
+<span>/</span>
+<a>Education Studies Guidelines</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Call for Papers • Inaugural Volume</span>
+    <h2>Tunu Journal: Education Studies</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Official author guidelines and submission specifications for manuscripts in Education, Pedagogy, and Learning Systems (October 2026).</p>
+</div>
+
+<div class="article-view-layout">
+    <div class="article-full-content">
+        <div class="article-body-text">
+            
+            <div style="background: rgba(197, 160, 89, 0.08); border-left: 4px solid var(--gold); padding: 20px; border-radius: 0 4px 4px 0; margin-bottom: 30px;">
+                <h3 style="margin-top: 0; color: var(--accent);"><i class="fas fa-info-circle"></i> Scope of the Division</h3>
+                <p style="margin-bottom: 0; line-height: 1.7;">
+                    The <strong>Education Studies Division</strong> of the Tunu Journal publishes original empirical studies, critical reviews, and theoretical articles exploring contemporary educational structures. We welcome contributions that advance our understanding of learning methodologies, pedagogical scaffolding, cognitive technologies, and educational administration across global communities.
+                </p>
+            </div>
+
+            <h3>1. Thematic & Disciplinary Areas</h3>
+            <p>To qualify for the double-blind peer-review cycle, submitted manuscripts must align directly with one of our core research areas:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Pedagogy and Learning Paradigms:</strong> Research addressing instructional methodologies, metacognitive self-regulation, reflexive teaching practices, and student engagement models.</li>
+                <li style="margin-bottom: 10px;"><strong>Technology-Enhanced Learning:</strong> Investigations into the design and application of virtual classroom spaces, cognitive offloading mechanics in academic software, and algorithmic personalization models.</li>
+                <li style="margin-bottom: 10px;"><strong>Educational Policy and Administration:</strong> Comparative policy reviews, institutional management theories, resource distribution equity, and regional curriculum standardization.</li>
+                <li style="margin-bottom: 10px;"><strong>Special and Inclusive Education:</strong> Empirical studies on adaptive technologies, systemic barriers in higher education institutions, and differentiated learning methodologies.</li>
+            </ul>
+
+            <h3>2. Manuscript Formatting Specifications</h3>
+            <p>Authors must strictly prepare and structure their draft manuscripts in accordance with the following structural constraints:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Format:</strong> All files must be submitted as editable documents using <em>Microsoft Word</em> format (.doc or .docx). PDFs or lock-protected files will be rejected.</li>
+                <li style="margin-bottom: 10px;"><strong>Typography:</strong> Use 12pt <em>Times New Roman</em> font exclusively. Set margins to 1 inch (2.54 cm) on all sides.</li>
+                <li style="margin-bottom: 10px;"><strong>Line Spacing:</strong> The entire document must use double line spacing (2.0) or 1.5 line spacing, with page numbers aligned bottom-right.</li>
+                <li style="margin-bottom: 10px;"><strong>Abstract:</strong> Every paper must include a structured abstract of <strong>200 to 250 words</strong> outlining the study objectives, methodology, core findings, and primary academic conclusions.</li>
+                <li style="margin-bottom: 10px;"><strong>Word Limits:</strong> The final manuscript should be between <strong>5,000 and 8,000 words</strong>, including titles, inline tables, footnotes, and final reference sheets.</li>
+            </ul>
+
+            <h3>3. Citations and Referencing Standards</h3>
+            <p>Absolute academic integrity is required. Unreferenced statements or poor citation designs will result in immediate desk rejection:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Style Guide:</strong> Authors must strictly adhere to the citation guidelines of the <strong>American Psychological Association (APA) 7th Edition</strong>.</li>
+                <li style="margin-bottom: 10px;"><strong>DOIs:</strong> Where available, active digital object identifier (DOI) links must be appended to individual bibliographic references.</li>
+                <li style="margin-bottom: 10px;"><strong>Footnotes:</strong> Avoid substantive footnotes. Relevant information should be integrated directly into the main narrative framework.</li>
+            </ul>
+
+            <h3>4. Title Page Metadata Requirement</h3>
+            <p>To facilitate the double-blind review system, authors must provide contact and biographical metadata *only* on the first sheet of their initial draft:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-heading" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Manuscript Title</h5>
+                </div>
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-user-graduate" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Author Name(s)</h5>
+                </div>
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-university" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Affiliated Institution</h5>
+                </div>
+                <div style="background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; text-align: center;">
+                    <i class="fas fa-envelope-open-text" style="color: var(--gold); font-size: 1.5rem; margin-bottom: 8px;"></i>
+                    <h5 style="margin: 0; font-family: sans-serif;">Contact & Email</h5>
+                </div>
+            </div>
+
+            <h3>5. Submission Routing & Timelines</h3>
+            <p>Manuscripts must be delivered electronically using our secure administrative networks:</p>
+            <ul style="margin-bottom: 25px; padding-left: 20px;">
+                <li style="margin-bottom: 10px;"><strong>Submission Portal:</strong> File your editable Word document via email to: <a href="mailto:submissions@tunujournal.com" style="color: var(--accent); font-weight: bold;">submissions@tunujournal.com</a>.</li>
+                <li style="margin-bottom: 10px;"><strong>Email Subject:</strong> Format the subject header as follows: <em>[Submission: Education Studies] Primary Author Surname</em>.</li>
+                <li style="margin-bottom: 10px;"><strong>Deadline:</strong> All submission packets for the upcoming issue must be transmitted before <strong>October 30, 2026</strong>.</li>
+            </ul>
+
+        </div>
+    </div>
+
+    <!-- Right Sidebar with Board Details and Policies -->
+    <div class="article-sidebar">
+        
+        <!-- General Division Info -->
+        <div class="sidebar-widget">
+            <h4>Division Info</h4>
+            <p style="margin-bottom: 8px;"><strong>Frequency:</strong> Bi-annually (January & October)</p>
+            <p style="margin-bottom: 8px;"><strong>Languages:</strong> English</p>
+            <p style="margin-bottom: 8px;"><strong>Fees:</strong> Free (No APC / Open Access)</p>
+            <p style="margin-bottom: 0;"><strong>Policy:</strong> Peer Review Double-Blind</p>
+        </div>
+
+        <!-- Section Editors -->
+        <div class="sidebar-widget">
+            <h4>Section Editors</h4>
+            <p style="font-size: 0.9rem; margin-bottom: 8px; line-height: 1.5;">
+                <strong>Dr. Helen Vance</strong><br>
+                <span style="opacity: 0.75; font-size: 0.8rem;">Metacognition & Instructional Design</span>
+            </p>
+            <p style="font-size: 0.9rem; margin-bottom: 15px; line-height: 1.5;">
+                <strong>Prof. Arthur Pendelton</strong><br>
+                <span style="opacity: 0.75; font-size: 0.8rem;">Cognitive Scaffolding Specialist</span>
+            </p>
+            
+            <h4 style="margin-top: 25px;">Institutional Contacts</h4>
+            <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 15px;">
+                <i class="fas fa-university" style="color: var(--gold); margin-right: 8px;"></i> Tunu Publishers Suite<br>
+                <i class="fas fa-phone" style="color: var(--gold); margin-right: 8px;"></i> +254 722 682 129
+            </p>
+            <p style="font-size: 0.85rem; line-height: 1.6;">
+                <i class="fas fa-globe" style="color: var(--gold); margin-right: 8px;"></i> <a href="http://www.tunujournal.com" target="_blank" style="color: inherit; text-decoration: none;">www.tunujournal.com</a><br>
+                <i class="fas fa-envelope" style="color: var(--gold); margin-right: 8px;"></i> <a href="mailto:support@tunujournal.com" style="color: inherit; text-decoration: none;">support@tunujournal.com</a>
+            </p>
+        </div>
+
+        <!-- Archival License -->
+        <div class="sidebar-widget">
+            <h4>Creative Commons</h4>
+            <p style="font-size: 0.8rem; line-height: 1.4; opacity: 0.8; margin-bottom: 0;">
+                Articles published in this section are protected under CC BY-NC 4.0, allowing non-commercial sharing with proper academic citation.
+            </p>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
