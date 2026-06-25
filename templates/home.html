@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="category-showcase-container" style="display: flex; flex-direction: column; gap: 50px;">
+    {% for cat in categories %}
+    <section class="category-block" style="border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+        <!-- Category Banner Header -->
+        <div class="category-banner" style="background: var(--header-bg); border-bottom: 3px solid var(--gold); padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <span class="badge" style="background: rgba(197, 160, 89, 0.2); color: var(--gold); margin-bottom: 5px;">Academic Discipline</span>
+                <h2 style="color: #ffffff; font-size: 1.8rem; letter-spacing: 0.05em; font-family: 'Georgia', serif; font-weight: 700; margin: 0;">{{ cat.name }}</h2>
+            </div>
+            {% if cat.latest_volume %}
+            <a href="{{ url_for('volume_detail', volume_id=cat.latest_volume.id) }}" class="btn-link" style="border-color: var(--gold); color: var(--gold); background: transparent; font-size: 0.8rem; padding: 6px 12px;">Browse Full Volume</a>
+            {% endif %}
+        </div>
+
+        <!-- Category Description Body -->
+        <div class="category-body" style="padding: 30px;">
+            {% if cat.latest_volume %}
+                <p style="font-style: italic; opacity: 0.85; margin-bottom: 25px; border-left: 3px solid var(--gold); padding-left: 15px; color: var(--ink);">
+                    {{ cat.latest_volume.desc }}
+                </p>
+                
+                {% if cat.current_issue %}
+                    <div class="current-issue-panel" style="background: var(--paper); border: 1px solid var(--border); border-radius: 4px; padding: 25px; margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 20px;">
+                            <h3 style="font-size: 1.3rem; color: var(--accent); margin: 0;">
+                                <i class="fas fa-bookmark" style="color: var(--gold); margin-right: 8px;"></i>
+                                Current Issue: {{ cat.current_issue.issue_number }} &mdash; {{ cat.current_issue.title }}
+                            </h3>
+                            <span style="font-family: sans-serif; font-size: 0.85rem; opacity: 0.7; font-weight: 600;">Published: {{ cat.current_issue.date }}</span>
+                        </div>
+
+                        <!-- Articles inside this Current Issue -->
+                        <div class="articles-list" style="display: flex; flex-direction: column; gap: 20px;">
+                            {% for art in cat.current_issue.articles %}
+                            <div class="article-preview-node" style="padding: 10px 0;">
+                                <a href="{{ url_for('article_detail', volume_id=cat.latest_volume.id, issue_id=cat.current_issue.id, article_id=art.id) }}" class="article-title-link" style="font-size: 1.25rem; font-weight: bold; color: var(--ink); text-decoration: none; cursor: pointer; transition: color 0.2s;">
+                                    {{ art.title }}
+                                </a>
+                                <div class="article-authors" style="font-style: italic; font-size: 0.95rem; margin-top: 5px; color: var(--ink); opacity: 0.8;">
+                                    By {{ art.authors }}
+                                </div>
+                                <p style="font-size: 0.9rem; opacity: 0.75; margin-top: 10px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    {{ art.abstract }}
+                                </p>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;">
+                                    <div class="keywords-list" style="display: flex; gap: 6px;">
+                                        {% for kw in art.keywords %}
+                                        <span class="keyword-tag" style="font-size: 0.7rem; padding: 2px 6px;">{{ kw }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    <a href="{{ url_for('article_detail', volume_id=cat.latest_volume.id, issue_id=cat.current_issue.id, article_id=art.id) }}" class="btn-link" style="font-size: 0.75rem; padding: 5px 12px;">Read Full Paper</a>
+                                </div>
+                            </div>
+                            {% if not loop.last %}
+                            <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0 0 0;">
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <p style="opacity: 0.6; font-size: 0.95rem;">No issue is currently published in this volume.</p>
+                {% endif %}
+            {% else %}
+                <p style="opacity: 0.6; font-size: 0.95rem;">No active volumes cataloged under this discipline.</p>
+            {% endif %}
+        </div>
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

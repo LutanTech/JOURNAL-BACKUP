@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a href="{{ url_for('volume_detail', volume_id=volume.id) }}">{{ volume.volume_number }}</a>
+<span>/</span>
+<a>{{ issue.issue_number }}</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">{{ volume.volume_number }} • {{ issue.date }}</span>
+    <h2>{{ issue.issue_number }}: {{ issue.title }}</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Displaying peer-reviewed articles accepted into this issue.</p>
+</div>
+<div>
+    {% for art in issue.articles %}
+    <div class="article-card">
+        <a class="article-title-link" href="{{ url_for('article_detail', volume_id=volume.id, issue_id=issue.id, article_id=art.id) }}">{{ art.title }}</a>
+        <div class="article-meta">
+            <span><i class="fas fa-user-edit"></i> {{ art.authors }}</span>
+            <span><i class="fas fa-fingerprint"></i> DOI: {{ art.doi }}</span>
+        </div>
+        <div class="article-excerpt">{{ art.abstract }}</div>
+        <div class="article-footer">
+            <div class="keywords-list">
+                {% for kw in art.keywords %}
+                <span class="keyword-tag">{{ kw }}</span>
+                {% endfor %}
+            </div>
+            <a class="btn-link" href="{{ url_for('article_detail', volume_id=volume.id, issue_id=issue.id, article_id=art.id) }}">READ FULL ARTICLE</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

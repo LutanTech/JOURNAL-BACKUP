@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>{{ volume.volume_number }}</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">{{ volume.subject }} • {{ volume.year }}</span>
+    <h2>{{ volume.volume_number }}: {{ volume.title }}</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Select an issue from this volume to review its peer-reviewed contents.</p>
+</div>
+<div>
+    {% for iss in volume.issues %}
+    <div class="issue-card">
+        <div class="issue-info">
+            <h4>{{ iss.issue_number }}: {{ iss.title }}</h4>
+            <p>{{ iss.date }} • {{ iss.articles | length }} Peer-reviewed Articles</p>
+        </div>
+        <a class="btn-link" href="{{ url_for('issue_detail', volume_id=volume.id, issue_id=iss.id) }}">EXPLORE ISSUE</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>All Archives</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Tunu Journal Repository</span>
+    <h2>Complete Archival Catalog</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Browse our entire historical catalogue of volumes and issues. Use the navigation below to flip through pages.</p>
+</div>
+
+<div class="archives-list">
+    {% for vol in volumes %}
+    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 30px; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.02);">
+        <div style="border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <span class="badge" style="margin-bottom: 5px;">{{ vol.subject }}</span>
+                <h3 style="font-size: 1.6rem; color: var(--accent); margin-top: 5px;">{{ vol.volume_number }}: {{ vol.title }}</h3>
+            </div>
+            <span style="font-family: sans-serif; font-size: 0.9rem; font-weight: 600; opacity: 0.7;">Year: {{ vol.year }}</span>
+        </div>
+        
+        <p style="margin-bottom: 25px; opacity: 0.8; font-style: italic;">{{ vol.desc }}</p>
+
+        <h4 style="font-family: sans-serif; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 15px;">Published Issues</h4>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            {% for iss in vol.issues %}
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--paper); padding: 15px 20px; border-radius: 4px; border-left: 3px solid var(--accent); gap: 15px; flex-wrap: wrap;">
+                <div>
+                    <h5 style="font-size: 1.1rem; color: var(--accent); font-weight: bold;">{{ iss.issue_number }}: {{ iss.title }}</h5>
+                    <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 2px;">Published: {{ iss.date }} • {{ iss.articles | length }} Peer-reviewed Articles</p>
+                </div>
+                <a class="btn-link" href="{{ url_for('issue_detail', volume_id=vol.id, issue_id=iss.id) }}" style="padding: 6px 12px; font-size: 0.75rem;">Explore Issue</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-top: 50px; border-top: 1px solid var(--border); padding-top: 25px;">
+    {% if page > 1 %}
+    <a href="{{ url_for('archives', page=page-1) }}" class="btn-link" style="display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-arrow-left"></i> Previous Page
+    </a>
+    {% else %}
+    <span class="btn-link" style="opacity: 0.3; cursor: not-allowed; display: inline-flex; align-items: center; gap: 8px;">
+        <i class="fas fa-arrow-left"></i> Previous Page
+    </span>
+    {% endif %}
+
+    <span style="font-family: sans-serif; font-size: 0.9rem; font-weight: 600; opacity: 0.8;">
+        Page {{ page }} of {{ total_pages }}
+    </span>
+
+    {% if page < total_pages %}
+    <a href="{{ url_for('archives', page=page+1) }}" class="btn-link" style="display: inline-flex; align-items: center; gap: 8px;">
+        Next Page <i class="fas fa-arrow-right"></i>
+    </a>
+    {% else %}
+    <span class="btn-link" style="opacity: 0.3; cursor: not-allowed; display: inline-flex; align-items: center; gap: 8px;">
+        Next Page <i class="fas fa-arrow-right"></i>
+    </span>
+    {% endif %}
+</div>
+{% endblock %}

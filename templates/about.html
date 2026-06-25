@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>About the Journal</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Institutional Profile & Archival Standards</span>
+    <h2>About The Tunu Journal</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">A premier scientific venue for the strict preservation, evaluation, and worldwide dissemination of peer-reviewed multi-disciplinary inquiry.</p>
+</div>
+
+<div class="article-view-layout">
+    <div class="article-full-content">
+        <div class="article-body-text">
+            <h3>1. Mission Statement & Scope</h3>
+            <p>The Tunu Journal is a peer-reviewed, open-access publication dedicated to the advancement of research across key multidisciplinary areas, with primary focuses in Reflexive Psychology, System Design, Kiswahili Studies, and Environmental Design. Our core objective is to bridge historical archival methods with contemporary computational and sociolinguistic theories, fostering intellectual rigor across global academic networks.</p>
+            <p>By publishing twice a year, the journal provides an international, open-access platform where language preservation, cognitive studies, ecological system modeling, and computational frameworks intersect. We seek to challenge conventional silos by insisting on methodological transparency, reproducible datasets, and deep philosophical grounding across all accepted manuscripts.</p>
+
+            <h3>2. Specialized Areas of Scientific Inquiry</h3>
+            <p>The journal actively commissions and accepts submissions within four major disciplinary categories:</p>
+            <ul>
+                <li><strong>Kiswahili & Bantu Linguistic Studies:</strong> Research focusing on phonological shifts, orthography standardization, sociolinguistics, grammatical structures, and the preservation of endangered dialects in the East African region and the wider Bantu-speaking world.</li>
+                <li><strong>Reflexive Psychology:</strong> Empirical and theoretical investigations into human metacognition, cognitive unloading mechanisms, expressive journaling dynamics, and somatic indicators of mental wellness and reflective practice.</li>
+                <li><strong>System Design & Computational Ethics:</strong> Analysis of software architecture durability, long-term digital curation methodologies, database consistency verification, and the social and ethical alignment of autonomous decision-making models.</li>
+                <li><strong>Environmental Design & Urban Ecology:</strong> Case studies and quantitative research on vertical infrastructure vegetation, microclimatic heat mitigation, regional sustainable materials, and architecture adapted to tropical and equatorial metropolitan zones.</li>
+            </ul>
+
+            <h3>3. Editorial Independence & Review Process</h3>
+            <p>Every manuscript submitted to the journal undergoes a rigorous double-blind peer-review process coordinated by our distinguished Faculty Board. Reviewers are selected based on their specific domain expertise, ensuring objective evaluations, methodological verification, and constructive critiques. Authors are expected to conform strictly to institutional citation guides and research ethics standards before filing manuscripts.</p>
+            <p>The evaluation cycle is strictly governed by the following stages:</p>
+            <ol>
+                <li><strong>Initial Screening:</strong> The Editor-in-Chief and Section Editors review submissions for alignment with journal scope, basic formatting compliance, and structural validity.</li>
+                <li><strong>Double-Blind Evaluation:</strong> Manuscripts passing initial screening are assigned to at least two external anonymous peer-reviewers who possess deep domain-specific expertise.</li>
+                <li><strong>Synthesis and Editorial Verdict:</strong> Based on peer feedback, the editorial committee issues a verdict of Acceptance, Revision Required (Minor or Major), or Outright Rejection.</li>
+            </ol>
+
+            <h3>4. Open Access & Archival Preservation Policy</h3>
+            <p>In accordance with our commitment to democratization of scientific knowledge, all published volumes are fully open-access immediately upon cataloging. We utilize decentralized preservation models to maintain database replication across library servers, ensuring that published scientific work remains pristine and accessible across generations.</p>
+            <p>We believe that high-quality scientific literature should be a public good, free from financial barriers for readers worldwide. Consequently, we charge no subscription fees to libraries, researchers, or students. To safeguard the longevity of published records, our metadata standards are fully mapped to global academic indexers, ensuring persistent cross-referencing and metadata harvesting capabilities even as storage hardware architectures evolve.</p>
+
+            <h3>5. Guidelines for Submitting Authors</h3>
+            <p>Authors seeking publication in the journal must prepare their submissions under strict guidelines to ensure speedy evaluation and consistency in our archival layout:</p>
+            <ul>
+                <li><strong>Manuscript Preparation:</strong> Papers must include an abstract (maximum 250 words), 3 to 6 indexing keywords, a clear introduction, robust methodology, quantitative/qualitative data analysis, and a comprehensive list of references.</li>
+                <li><strong>Citation Standards:</strong> Submissions must strictly follow the APA 7th Edition style guide for inline references and final bibliographies.</li>
+                <li><strong>Dataset Availability:</strong> Where applicable, raw computational, linguistic, or physiological datasets must be securely uploaded alongside the manuscript to facilitate peer-review audit checks.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="article-sidebar">
+        <div class="sidebar-widget">
+            <h4>Quick Metrics</h4>
+            <p style="margin-bottom: 8px;"><strong>Frequency:</strong> Semi-Annually (January & July)</p>
+            <p style="margin-bottom: 8px;"><strong>Format:</strong> Open Access Digital & Print-on-Demand</p>
+            <p style="margin-bottom: 8px;"><strong>ISSN (Online):</strong> 2026-8941</p>
+            <p style="margin-bottom: 8px;"><strong>Acceptance Rate:</strong> 18.4%</p>
+            <p style="margin-bottom: 15px;"><strong>Average Review Time:</strong> 8-12 Weeks</p>
+            <a href="{{ url_for('home') }}" class="btn-link" style="display: block; text-align: center;">View Catalog</a>
+        </div>
+
+        <div class="sidebar-widget">
+            <h4>Publisher Details</h4>
+            <p style="font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px;">
+                <strong>Editorial Offices:</strong><br>
+                Tunu Publishers<br>
+                P.O. Box 7188-00100<br>
+                Harambee SACCO Shopping Centre,<br>
+                Donholm,<br>
+                Nairobi, Kenya
+            </p>
+            <p style="font-size: 0.85rem; margin-bottom: 5px;"><strong>Email:</strong> archives@tunujournal.com</p>
+            <p style="font-size: 0.85rem;"><strong>Inquiries:</strong> support@tunujournal.com</p>
+        </div>
+
+        <div class="sidebar-widget">
+            <h4>Archival License</h4>
+            <p style="font-size: 0.85rem; line-height: 1.4; opacity: 0.8;">
+                All works published here are licensed under a Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) License.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

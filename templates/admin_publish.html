@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a href="{{ url_for('admin_portal') }}">System Administration</a>
+<span>/</span>
+<a>Publish Article</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+{% if session.get('admin_logged_in') %}
+
+<style>
+    .admin-nav-link {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--ink);
+        font-family: sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 12px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .admin-nav-link:hover {
+        background: rgba(0, 0, 0, 0.03);
+    }
+    body.dark-theme .admin-nav-link:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .admin-nav-link.active {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: #ffffff;
+    }
+</style>
+
+<div class="archive-details-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <div>
+        <span class="archive-details-subtitle">Control Panel</span>
+        <h2>Repository Management</h2>
+    </div>
+    <a href="{{ url_for('admin_logout') }}" class="btn-link" style="border-color: #e74c3c; color: #e74c3c;"><i class="fas fa-sign-out-alt"></i> De-authenticate Session</a>
+</div>
+
+<div style="display: flex; gap: 10px; margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 20px; flex-wrap: wrap;">
+    <a class="admin-nav-link" href="{{ url_for('admin_portal') }}">
+        <i class="fas fa-list-check"></i> Inventory Overview
+    </a>
+    <a class="admin-nav-link" href="{{ url_for('admin_structure') }}">
+        <i class="fas fa-folder-plus"></i> Volumes & Issues
+    </a>
+    <a class="admin-nav-link active" href="{{ url_for('admin_publish') }}">
+        <i class="fas fa-file-signature"></i> Publish Article
+    </a>
+</div>
+
+<div style="background: var(--card-bg); border: 1px solid var(--border); padding: 30px; border-radius: 6px; margin-bottom: 40px;">
+    <h3 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 20px; border-bottom: 2px solid var(--gold); padding-bottom: 10px;">
+        <i class="fas fa-file-signature" style="color: var(--gold); margin-right: 8px;"></i> File New Research Article
+    </h3>
+    <form action="{{ url_for('admin_add_article') }}" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px;">
+        <div>
+            <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Target Issue Designation</label>
+            <select name="issue_id" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none;">
+                {% for vol in volumes %}
+                    <optgroup label="{{ vol.volume_number }} — {{ vol.subject }}">
+                        {% for iss in vol.issues %}
+                        <option value="{{ iss.id }}">{{ iss.issue_number }}: {{ iss.title }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Manuscript Title</label>
+                <input type="text" name="title" required placeholder="e.g., Semantic Shift in Kiswahili Nominal Classes" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+            </div>
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Digital Object Identifier (DOI)</label>
+                <input type="text" name="doi" required placeholder="e.g., 10.5555/tunu.2026.16.1.1" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Lead & Co-Authors (Comma Separated)</label>
+                <input type="text" name="authors" required placeholder="e.g., Prof. Chacha Nyaigotti-Chacha, Dr. John Mwangi" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+            </div>
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Indexing Keywords (Comma Separated)</label>
+                <input type="text" name="keywords_raw" required placeholder="e.g., Syntax, Semantics, Bantu Languages" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Upload Manuscript PDF File</label>
+                <input type="file" name="pdf_file" accept=".pdf" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+            </div>
+        </div>
+        <div>
+            <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Scientific Abstract</label>
+            <textarea name="abstract" required placeholder="Provide a concise summary of the core methodology, discoveries, and context..." style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); font-family: inherit; outline: none;"></textarea>
+        </div>
+        <div>
+            <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 5px; opacity: 0.8;">Main Manuscript Body (HTML Tag Formatting Supported)</label>
+            <textarea name="body_text" required placeholder="<h3>1. Paradigm Foundations</h3><p>Manuscript text content goes here...</p>" style="width: 100%; min-height: 250px; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); font-family: monospace; outline: none;"></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Publish Research Article</button>
+    </form>
+</div>
+
+{% else %}
+<div style="display: flex; justify-content: center; align-items: center; padding: 40px 0;">
+    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; width: 100%; max-width: 440px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; background: rgba(197, 160, 89, 0.1); border: 2px solid var(--gold); border-radius: 50%; width: 60px; height: 60px; color: var(--gold); font-size: 1.5rem; margin-bottom: 15px;">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h2 style="font-size: 1.8rem; color: var(--accent); margin-bottom: 5px;">Portal Gatekeeper</h2>
+            <p style="font-size: 0.9rem; opacity: 0.75;">Administrative authorization is mandatory to execute repository modifications.</p>
+        </div>
+        <div style="background: #fdf2f2; border: 1px solid #f5baba; color: #de3b3b; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 0.85rem; font-family: sans-serif; text-align: center;">
+            <i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i> Authorization required.
+        </div>
+        <a href="{{ url_for('admin_portal') }}" class="btn-submit" style="text-align: center; text-decoration: none;">Go to Login Portal</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

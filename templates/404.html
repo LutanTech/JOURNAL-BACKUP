@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>404 Error</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 80px 20px; max-width: 600px; margin: 0 auto;">
+    <div style="font-size: 6rem; color: var(--gold); font-family: 'Georgia', serif; line-height: 1; margin-bottom: 20px; font-weight: bold;">
+        404
+    </div>
+    <h2 style="font-size: 2rem; color: var(--accent); margin-bottom: 15px; font-weight: normal;">Archival Document Not Found</h2>
+    <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 40px; font-style: italic; line-height: 1.7;">
+        The volume, issue, or manuscript you are attempting to access does not exist in our active repository. It may have been cataloged under a different designation or decommissioned.
+    </p>
+
+    <form action="{{ url_for('search') }}" method="get" style="display: flex; gap: 10px; margin-bottom: 40px;">
+        <input type="text" name="q" placeholder="Search the catalog..." style="flex-grow: 1; padding: 12px 20px; border: 1px solid var(--border); border-radius: 4px; background: var(--card-bg); color: var(--ink); outline: none;">
+        <button type="submit" style="background: var(--ink); color: var(--paper); border: 1px solid var(--ink); border-radius: 4px; padding: 12px 20px; cursor: pointer;">Search</button>
+    </form>
+
+    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+        <a href="{{ url_for('home') }}" class="btn-link">Return to Homepage</a>
+        <a href="{{ url_for('archives') }}" class="btn-link">Browse Archives</a>
+    </div>
+</div>
+{% endblock %}

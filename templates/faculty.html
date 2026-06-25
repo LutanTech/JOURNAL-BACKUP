@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>Faculty & Authors</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Editorial Governance</span>
+    <h2>Faculty Board & Editorial Staff</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Our board ensures rigorous blind review standards are met to maintain archival integrity.</p>
+</div>
+<div style="max-width: 800px; margin: 0 auto;">
+    {% for f in faculty %}
+    <div class="author-card">
+        <div class="author-avatar">{{ f.name[0] }}{{ f.name.split(' ')[1][0] if f.name.split(' ') | length > 1 else '' }}</div>
+        <div class="author-info">
+            <h4>{{ f.name }}</h4>
+            <p style="color: var(--gold); font-weight: 600; margin-bottom: 2px;">{{ f.role }}</p>
+            <p>{{ f.institution }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

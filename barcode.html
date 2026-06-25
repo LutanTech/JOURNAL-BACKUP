@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ISBN Barcode Generator | TUNU Publishers</title>
+    
+        <link rel="icon" type="image/png" href="https://tunupublishers.com/assets/images/logo.png">
+        <link rel="apple-touch-icon" href="https://tunupublishers.com/assets/images/logo.png">
+    
+        <meta name="title" content="ISBN Barcode Generator | TUNU Publishers">
+        <meta name="description" content="Generate, validate, preview, and download ISBN 13 barcodes as PNG or SVG with TUNU Publishers.">
+        <meta name="keywords" content="ISBN barcode generator, ISBN 13 barcode, EAN 13 barcode, TUNU Publishers, book barcode generator">
+        <meta name="author" content="TUNU Publishers">
+        <meta name="robots" content="index, follow">
+        <meta name="theme-color" content="#850075">
+    
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="ISBN Barcode Generator | TUNU Publishers">
+        <meta property="og:description" content="Generate and validate ISBN 13 barcodes, then save them as PNG or SVG.">
+        <meta property="og:image" content="https://tunupublishers.com/assets/images/logo.png">
+        <meta property="og:image:alt" content="TUNU Publishers Logo">
+        <meta property="og:site_name" content="TUNU Publishers">
+    
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="ISBN Barcode Generator | TUNU Publishers">
+        <meta name="twitter:description" content="Generate and validate ISBN 13 barcodes, then save them as PNG or SVG.">
+        <meta name="twitter:image" content="https://tunupublishers.com/assets/images/logo.png">
+        <meta name="twitter:image:alt" content="TUNU Publishers Logo">
+        <link rel="canonical" href="https://tunupublishers.com/isbn-barcode-generator">
+        <meta property="og:url" content="https://tunupublishers.com/isbn-barcode-generator">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Courier+Prime:wght@700&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fcfbfe;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-center py-6 px-4">
+
+    <main class="max-w-4xl mx-auto w-full bg-white border border-purple-100 rounded-2xl shadow-xl shadow-purple-900/5 p-5 sm:p-8">
+        
+        <div class="border-b border-purple-50 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-[#850075]">TUNU PUBLISHERS</h1>
+                <p class="text-xs text-slate-400">ISBN-13 Barcode Generator</p>
+            </div>
+            <div class="flex gap-1.5">
+                <button id="btn-quick-978" class="px-3 py-1 bg-[#850075] hover:bg-[#700062] text-[11px] font-bold rounded-full text-white transition-all">
+                    978 Prefix
+                </button>
+                <button id="btn-quick-979" class="px-3 py-1 bg-[#850075] hover:bg-[#700062] text-[11px] font-bold rounded-full text-white transition-all">
+                    979 Prefix
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <div class="md:col-span-5 space-y-5">
+                
+                <div class="space-y-3.5">
+                    <div>
+                        <label for="isbn-input" class="block text-xs font-bold text-slate-500 mb-1">
+                            ISBN Code (12 or 13 digits)
+                        </label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                id="isbn-input" 
+                                class="w-full bg-slate-50 border border-slate-200 focus:border-[#850075] focus:bg-white text-[#850075] font-mono text-sm rounded-xl px-3.5 py-2.5 outline-none transition-all tracking-wider"
+                                placeholder="9789914352566"
+                                maxlength="17"
+                                autocomplete="off"
+                            >
+                            <span id="char-counter" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-mono">
+                                0/13
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t border-purple-50 pt-4 space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs font-bold text-slate-500">Scale / Resolution</label>
+                            <span id="scale-val" class="text-xs text-[#850075] font-mono font-bold">2.0x</span>
+                        </div>
+                        <input type="range" id="param-scale" min="1.5" max="3.5" step="0.1" value="2.0" class="w-full accent-[#850075]">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-xs font-bold text-slate-500">Bar Height (px)</label>
+                            <span id="height-val" class="text-xs text-[#850075] font-mono font-bold">80px</span>
+                        </div>
+                        <input type="range" id="param-height" min="40" max="150" step="5" value="80" class="w-full accent-[#850075]">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Foreground</label>
+                            <div class="flex gap-1.5">
+                                <input type="color" id="param-fg" value="#000000" class="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0">
+                                <input type="text" id="param-fg-hex" value="#000000" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-mono text-center text-slate-700 py-1">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Background</label>
+                            <div class="flex gap-1.5">
+                                <input type="color" id="param-bg" value="#ffffff" class="w-8 h-8 bg-transparent border-0 rounded cursor-pointer shrink-0">
+                                <input type="text" id="param-bg-hex" value="#ffffff" class="w-full bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-mono text-center text-slate-700 py-1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-500">
+                            <input type="checkbox" id="param-include-text" checked class="w-4 h-4 rounded border-slate-300 text-[#850075] focus:ring-[#850075]">
+                            <span>Show numbers below barcode</span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="md:col-span-7 flex flex-col items-center justify-center border border-purple-50 bg-slate-50/50 rounded-2xl p-6 min-h-[280px]">
+                
+                <div id="empty-state" class="text-center py-6">
+                    <p class="text-xs font-semibold text-slate-400">Enter at least 12 digits to generate barcode</p>
+                </div>
+
+                <div id="preview-container" class="hidden w-full flex flex-col items-center gap-5">
+                    
+                    <div id="validation-box" class="w-full rounded-xl p-3 border text-center transition-all">
+                        <span id="validation-title" class="text-xs font-bold"></span>
+                    </div>
+
+                    <div class="p-4 bg-white rounded-xl shadow-sm border border-purple-50 flex justify-center items-center overflow-x-auto max-w-full">
+                        <canvas id="barcode-canvas" class="max-w-full h-auto"></canvas>
+                    </div>
+
+                    <div class="w-full max-w-xs grid grid-cols-2 gap-2.5">
+                        <button id="btn-download-png" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#850075] hover:bg-[#700062] text-white font-bold rounded-full text-xs transition-all active:scale-[0.98]">
+                            Save PNG
+                        </button>
+                        <button id="btn-download-svg" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-white hover:bg-slate-50 text-[#850075] font-bold rounded-full text-xs transition-all border border-[#850075] active:scale-[0.98]">
+                            Save SVG
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        const isbnInput = document.getElementById('isbn-input');
+        const charCounter = document.getElementById('char-counter');
+        const validationBox = document.getElementById('validation-box');
+        const validationTitle = document.getElementById('validation-title');
+        const emptyState = document.getElementById('empty-state');
+        const previewContainer = document.getElementById('preview-container');
+        const barcodeCanvas = document.getElementById('barcode-canvas');
+
+        const paramScale = document.getElementById('param-scale');
+        const scaleVal = document.getElementById('scale-val');
+        const paramHeight = document.getElementById('param-height');
+        const heightVal = document.getElementById('height-val');
+        const paramFg = document.getElementById('param-fg');
+        const paramFgHex = document.getElementById('param-fg-hex');
+        const paramBg = document.getElementById('param-bg');
+        const paramBgHex = document.getElementById('param-bg-hex');
+        const paramIncludeText = document.getElementById('param-include-text');
+
+        const btnDownloadPng = document.getElementById('btn-download-png');
+        const btnDownloadSvg = document.getElementById('btn-download-svg');
+        const btnQuick978 = document.getElementById('btn-quick-978');
+        const btnQuick979 = document.getElementById('btn-quick-979');
+
+        const L_CODE = [
+            "0001101", "0011001", "0010011", "0111101", "0100011",
+            "0110001", "0101111", "0111011", "0110111", "0001011"
+        ];
+        const G_CODE = [
+            "0100111", "0110011", "0011011", "0100001", "0011101",
+            "0111001", "0000101", "0010001", "0001001", "0010111"
+        ];
+        const R_CODE = [
+            "1110010", "1100110", "1101100", "1000010", "1011100",
+            "1001110", "1010000", "1000100", "1001000", "1110100"
+        ];
+        const STRUCTURE_TABLE = [
+            "LLLLLL", "LLGLGG", "LLGGLG", "LLGGGL", "LGLLGG",
+            "LGGLLG", "LGGGLL", "LGLGLG", "LGLGGL", "LGGLGL"
+        ];
+
+        function cleanNumberString(val) {
+            return val.replace(/\D/g, "");
+        }
+
+        function calculateChecksum(isbn12) {
+            let sum = 0;
+            for (let i = 0; i < 12; i++) {
+                let digit = parseInt(isbn12[i], 10);
+                sum += (i % 2 === 0) ? digit * 1 : digit * 3;
+            }
+            let mod = sum % 10;
+            return mod === 0 ? 0 : 10 - mod;
+        }
+
+        function syncHexWithPicker(picker, textInput) {
+            picker.addEventListener('input', () => {
+                textInput.value = picker.value.toUpperCase();
+                processRendering();
+            });
+            textInput.addEventListener('input', () => {
+                let val = textInput.value;
+                if (!val.startsWith('#')) val = '#' + val;
+                if (/^#[0-9A-F]{6}$/i.test(val)) {
+                    picker.value = val;
+                    processRendering();
+                }
+            });
+        }
+        syncHexWithPicker(paramFg, paramFgHex);
+        syncHexWithPicker(paramBg, paramBgHex);
+
+        function updateSliderValue(slider, indicator, suffix) {
+            slider.addEventListener('input', () => {
+                indicator.textContent = slider.value + suffix;
+                processRendering();
+            });
+        }
+        updateSliderValue(paramScale, scaleVal, 'x');
+        updateSliderValue(paramHeight, heightVal, 'px');
+        paramIncludeText.addEventListener('change', processRendering);
+
+        isbnInput.addEventListener('input', () => {
+            let raw = isbnInput.value;
+            let cleaned = cleanNumberString(raw);
+            isbnInput.value = cleaned.slice(0, 13);
+            charCounter.textContent = `${isbnInput.value.length}/13`;
+            processRendering();
+        });
+
+        btnQuick978.addEventListener('click', () => {
+            isbnInput.value = "978";
+            charCounter.textContent = "3/13";
+            isbnInput.focus();
+            processRendering();
+        });
+
+        btnQuick979.addEventListener('click', () => {
+            isbnInput.value = "979";
+            charCounter.textContent = "3/13";
+            isbnInput.focus();
+            processRendering();
+        });
+
+        function getEan13Sequence(digits) {
+            let sequence = "";
+            sequence += "101";
+            let firstDigit = parseInt(digits[0], 10);
+            let structure = STRUCTURE_TABLE[firstDigit];
+            for (let i = 1; i <= 6; i++) {
+                let digit = parseInt(digits[i], 10);
+                let mode = structure[i - 1];
+                if (mode === 'L') {
+                    sequence += L_CODE[digit];
+                } else {
+                    sequence += G_CODE[digit];
+                }
+            }
+            sequence += "01010";
+            for (let i = 7; i <= 12; i++) {
+                let digit = parseInt(digits[i], 10);
+                sequence += R_CODE[digit];
+            }
+            sequence += "101";
+            return sequence;
+        }
+
+        function processRendering() {
+            let rawIsbn = cleanNumberString(isbnInput.value);
+            if (rawIsbn.length < 12) {
+                emptyState.classList.remove('hidden');
+                previewContainer.classList.add('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+            previewContainer.classList.remove('hidden');
+            let calculatedCheck = calculateChecksum(rawIsbn.slice(0, 12));
+            let isComplete = rawIsbn.length === 13;
+            let userCheck = isComplete ? parseInt(rawIsbn[12], 10) : null;
+            if (isComplete) {
+                if (userCheck === calculatedCheck) {
+                    validationBox.className = "w-full rounded-xl p-2 border bg-emerald-50 border-emerald-200 text-emerald-800 text-center transition-all";
+                    validationTitle.textContent = "ISBN Validated";
+                } else {
+                    validationBox.className = "w-full rounded-xl p-2 border bg-rose-50 border-rose-200 text-rose-800 text-center transition-all";
+                    validationTitle.textContent = `Invalid Checksum (Expected: ${calculatedCheck})`;
+                }
+            } else {
+                validationBox.className = "w-full rounded-xl p-2 border bg-orange-50 border-orange-200 text-orange-800 text-center transition-all";
+                validationTitle.textContent = `Pending last digit: autocompleting with ${calculatedCheck}`;
+            }
+            let compileIsbn = rawIsbn.slice(0, 12) + calculatedCheck;
+            renderBarcode(compileIsbn);
+        }
+
+        function renderBarcode(isbn) {
+            let scale = parseFloat(paramScale.value);
+            let barHeight = parseInt(paramHeight.value, 10);
+            let fgColor = paramFg.value;
+            let bgColor = paramBg.value;
+            let showText = paramIncludeText.checked;
+            let eanSequence = getEan13Sequence(isbn);
+            let moduleWidth = 1;
+            let ean13TotalModules = 95;
+            let quietZoneLeft = 10;
+            let quietZoneRight = 10;
+            let totalWidth = ean13TotalModules + quietZoneLeft + quietZoneRight;
+            let extraTextHeight = showText ? 24 : 0;
+            let totalHeight = barHeight + 10 + extraTextHeight;
+            barcodeCanvas.width = totalWidth * scale;
+            barcodeCanvas.height = totalHeight * scale;
+            let ctx = barcodeCanvas.getContext('2d');
+            ctx.scale(scale, scale);
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, totalWidth, totalHeight);
+            ctx.fillStyle = fgColor;
+            let startX = quietZoneLeft;
+            for (let i = 0; i < eanSequence.length; i++) {
+                if (eanSequence[i] === '1') {
+                    let isGuard = (i < 3 || (i >= 45 && i < 50) || i >= 92);
+                    let currentHeight = isGuard ? (barHeight + 6) : barHeight;
+                    ctx.fillRect(startX + i * moduleWidth, 5, moduleWidth, currentHeight);
+                }
+            }
+            if (showText) {
+                ctx.fillStyle = fgColor;
+                ctx.font = `bold 10px 'Courier Prime', monospace`;
+                ctx.textBaseline = "top";
+                let firstDigit = isbn[0];
+                let leftGroup = isbn.slice(1, 7);
+                let rightGroup = isbn.slice(7, 13);
+                ctx.fillText(firstDigit, quietZoneLeft - 7, barHeight + 3);
+                let leftWidth = 42 * moduleWidth;
+                let leftTextX = quietZoneLeft + 3 + (leftWidth / 2);
+                ctx.textAlign = "center";
+                ctx.fillText(leftGroup, leftTextX, barHeight + 7);
+                let rightWidth = 42 * moduleWidth;
+                let rightTextX = quietZoneLeft + 50 + (rightWidth / 2);
+                ctx.textAlign = "center";
+                ctx.fillText(rightGroup, rightTextX, barHeight + 7);
+            }
+        }
+
+        function generateSvgString(isbn) {
+            let barHeight = parseInt(paramHeight.value, 10);
+            let fgColor = paramFg.value;
+            let bgColor = paramBg.value;
+            let showText = paramIncludeText.checked;
+            let eanSequence = getEan13Sequence(isbn);
+            let moduleWidth = 1.2;
+            let ean13TotalModules = 95;
+            let quietZoneLeft = 15;
+            let quietZoneRight = 15;
+            let totalWidth = (ean13TotalModules * moduleWidth) + quietZoneLeft + quietZoneRight;
+            let extraTextHeight = showText ? 24 : 0;
+            let totalHeight = barHeight + 15 + extraTextHeight;
+            let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${totalWidth}" height="${totalHeight}" viewBox="0 0 ${totalWidth} ${totalHeight}">\n`;
+            svg += `  <rect width="100%" height="100%" fill="${bgColor}"/>\n`;
+            let startX = quietZoneLeft;
+            for (let i = 0; i < eanSequence.length; i++) {
+                if (eanSequence[i] === '1') {
+                    let isGuard = (i < 3 || (i >= 45 && i < 50) || i >= 92);
+                    let currentHeight = isGuard ? (barHeight + 6) : barHeight;
+                    let x = startX + (i * moduleWidth);
+                    svg += `  <rect x="${x.toFixed(2)}" y="5" width="${moduleWidth.toFixed(2)}" height="${currentHeight}" fill="${fgColor}"/>\n`;
+                }
+            }
+            if (showText) {
+                let firstDigit = isbn[0];
+                let leftGroup = isbn.slice(1, 7);
+                let rightGroup = isbn.slice(7, 13);
+                svg += `  <text x="${(quietZoneLeft - 8)}" y="${(barHeight + 15)}" font-family="Courier Prime, monospace" font-size="12" font-weight="bold" fill="${fgColor}" text-anchor="start">${firstDigit}</text>\n`;
+                let leftGroupX = quietZoneLeft + (3 * moduleWidth) + ((42 * moduleWidth) / 2);
+                svg += `  <text x="${leftGroupX.toFixed(2)}" y="${(barHeight + 17)}" font-family="Courier Prime, monospace" font-size="12" font-weight="bold" fill="${fgColor}" text-anchor="middle">${leftGroup}</text>\n`;
+                let rightGroupX = quietZoneLeft + (50 * moduleWidth) + ((42 * moduleWidth) / 2);
+                svg += `  <text x="${rightGroupX.toFixed(2)}" y="${(barHeight + 17)}" font-family="Courier Prime, monospace" font-size="12" font-weight="bold" fill="${fgColor}" text-anchor="middle">${rightGroup}</text>\n`;
+            }
+            svg += `</svg>`;
+            return svg;
+        }
+
+        btnDownloadPng.addEventListener('click', () => {
+            let rawIsbn = cleanNumberString(isbnInput.value);
+            let calculatedCheck = calculateChecksum(rawIsbn.slice(0, 12));
+            let compileIsbn = rawIsbn.slice(0, 12) + calculatedCheck;
+            let dataUrl = barcodeCanvas.toDataURL('image/png');
+            let link = document.createElement('a');
+            link.download = `isbn_${compileIsbn}_barcode.png`;
+            link.href = dataUrl;
+            link.click();
+        });
+
+        btnDownloadSvg.addEventListener('click', () => {
+            let rawIsbn = cleanNumberString(isbnInput.value);
+            let calculatedCheck = calculateChecksum(rawIsbn.slice(0, 12));
+            let compileIsbn = rawIsbn.slice(0, 12) + calculatedCheck;
+            let svgString = generateSvgString(compileIsbn);
+            let blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+            let url = URL.createObjectURL(blob);
+            let link = document.createElement('a');
+            link.download = `isbn_${compileIsbn}_barcode.svg`;
+            link.href = url;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        });
+
+        isbnInput.value = "978991435256";
+        charCounter.textContent = "12/13";
+        processRendering();
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a href="{{ url_for('volume_detail', volume_id=volume.id) }}">{{ volume.volume_number }}</a>
+<span>/</span>
+<a href="{{ url_for('issue_detail', volume_id=volume.id, issue_id=issue.id) }}">{{ issue.issue_number }}</a>
+<span>/</span>
+<a>Article Abstract</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="article-view-layout">
+    <div class="article-full-content">
+        <div class="article-header">
+            <span class="badge" style="margin-bottom: 15px;">{{ volume.volume_number }}, {{ issue.issue_number }}</span>
+            <h2>{{ article.title }}</h2>
+            <div class="article-authors">By {{ article.authors }}</div>
+            <div class="article-meta" style="margin-bottom: 0; margin-top: 15px;">
+                <span><i class="fas fa-fingerprint"></i> DOI: <a href="#" style="color: inherit;">{{ article.doi }}</a></span>
+                <span><i class="fas fa-calendar-alt"></i> Published: {{ issue.date }}</span>
+            </div>
+        </div>
+
+        <div class="article-abstract">
+            <h4>Abstract</h4>
+            <p>{{ article.abstract }}</p>
+        </div>
+
+        <div class="article-body-text">
+            {{ article.body_text | safe }}
+        </div>
+    </div>
+
+    <div class="article-sidebar">
+        <div class="sidebar-widget">
+            <h4>Document Actions</h4>
+            <div class="pdf-simulation">
+                <i class="fas fa-file-pdf"></i>
+                <p style="font-weight: 600; margin-bottom: 5px;">Archival PDF Format</p>
+                <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 15px;">Pre-compiled academic layout with formal pagination markers.</p>
+                <a class="btn-submit" href="{{ url_for('download_pdf', article_id=article.id) }}" style="font-size: 0.8rem; padding: 10px; display: block; text-decoration: none; text-align: center;">Download PDF</a>
+            </div>
+        </div>
+
+        <div class="sidebar-widget">
+            <h4>Cite This Work</h4>
+            <p style="font-style: italic; font-size: 0.85rem; line-height: 1.4; margin-bottom: 15px;" id="citation-text">
+                {{ article.authors.split(',')[0] }} (2026). "{{ article.title }}." <em>The Tunu Journal</em>, {{ volume.volume_number }}({{ issue.issue_number | replace('Issue ', '') }}). DOI: {{ article.doi }}
+            </p>
+            <button class="btn-link" onclick="copyCitation()" style="width: 100%; text-align: center;">Copy Citation</button>
+        </div>
+
+        <div class="sidebar-widget">
+            <h4>References</h4>
+            <ol class="references-list">
+                {% for ref in article.references %}
+                <li>{{ ref.text }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function copyCitation() {
+        const citationText = document.getElementById('citation-text').innerText;
+        const dummyInput = document.createElement('textarea');
+        dummyInput.value = citationText;
+        document.body.appendChild(dummyInput);
+        dummyInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummyInput);
+        showToast("Academic citation format copied to clipboard!");
+    }
+</script>
+{% endblock %}

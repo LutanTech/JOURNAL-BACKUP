@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>Search Results</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+
+{% block search_bar %}
+<form action="{{ url_for('search') }}" method="get" class="search-area" id="main-search-wrapper">
+    <input type="text" name="q" id="main-search-input" value="{{ query }}" placeholder="Search volumes, issues, authors, and keywords...">
+    <button type="submit" id="main-search-btn">SEARCH ARCHIVE</button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Query Matches</span>
+    <h2>Search Results for: "{{ query }}"</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Found {{ results | length }} matches inside the published journals.</p>
+</div>
+<div>
+    {% if results | length == 0 %}
+    <div style="text-align: center; padding: 60px 20px; border: 1px solid var(--border); border-radius: 4px; background: var(--card-bg);">
+        <i class="fas fa-search" style="font-size: 3rem; color: var(--gold); opacity: 0.5; margin-bottom: 20px;"></i>
+        <h4>No Exact Matches Found</h4>
+        <p style="max-width: 500px; margin: 10px auto 0 auto; opacity: 0.8;">Try using alternative keywords, author surnames, or broader thematic disciplines to locate the documents.</p>
+    </div>
+    {% else %}
+        {% for art in results %}
+        <div class="article-card">
+            <span class="badge">{{ art.issue.volume.volume_number }} • {{ art.issue.issue_number }}</span>
+            <a class="article-title-link" href="{{ url_for('article_detail', volume_id=art.issue.volume.id, issue_id=art.issue.id, article_id=art.id) }}">{{ art.title }}</a>
+            <div class="article-meta">
+                <span><i class="fas fa-user-edit"></i> {{ art.authors }}</span>
+                <span><i class="fas fa-fingerprint"></i> DOI: {{ art.doi }}</span>
+            </div>
+            <div class="article-excerpt">{{ art.abstract }}</div>
+            <div class="article-footer">
+                <div class="keywords-list">
+                    {% for kw in art.keywords %}
+                    <span class="keyword-tag">{{ kw }}</span>
+                    {% endfor %}
+                </div>
+                <a class="btn-link" href="{{ url_for('article_detail', volume_id=art.issue.volume.id, issue_id=art.issue.id, article_id=art.id) }}">VIEW WORK</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}
