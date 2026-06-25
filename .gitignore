@@ -1,0 +1,6 @@
+*.db
+__pycache__/
+instance/
+/tunu_journal.db
+tunu_journal.db
+.vscode

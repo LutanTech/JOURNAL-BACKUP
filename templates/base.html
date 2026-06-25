@@ -4,32 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Primary SEO Meta Tags -->
     <title>{% block title %}Tunu Journal - Archival Academic Repository{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}Tunu Journal is an established academic archival repository for peer-reviewed research papers, scholarly articles, and academic publications. Explore multi-disciplinary studies in Kiswahili, Psychology, System Design, and Education.{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}Tunu Journal, academic archive, research papers, journal repository, student publications, scholarly articles, Kiswahili studies, reflexive psychology, system design, environmental design{% endblock %}">
     <meta name="author" content="Tunu Journal">
     <link rel="canonical" href="{% block canonical_url %}https://tunujournal.com/{% endblock %}">
     
-    <!-- Open Graph / Facebook Metadata -->
     <meta property="og:title" content="{% block og_title %}Tunu Journal - Academic Archival Repository{% endblock %}">
     <meta property="og:description" content="{% block og_description %}An established platform for peer-reviewed academic research, scholarly journals, and digital preservation.{% endblock %}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{% block og_url %}https://tunujournal.com/{% endblock %}">
     <meta property="og:image" content="{% block og_image %}https://tunujournal.com/static/assets/icons/logo.png{% endblock %}">
     
-    <!-- Twitter Card Metadata -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{% block twitter_title %}Tunu Journal - Archival Academic Repository{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}Explore peer-reviewed multi-disciplinary research, digital archives, and scientific publications at the Tunu Journal.{% endblock %}">
     <meta name="twitter:image" content="{% block twitter_image %}https://tunujournal.com/static/assets/icons/logo.png{% endblock %}">
     
-    <!-- Icons & Shortcuts -->
     <link rel="shortcut icon" href="/static/assets/icons/icon_nbg.png" type="image/x-icon" onerror="this.href='https://placehold.co/32x32/1e293b/c5a059?text=T'">
-    <link rel="icon"  hre="{{ url_for('static', filename='assets/icons/icon_nbg.png') }}" type="image/x-icon" onerror="this.href='https://placehold.co/32x32/1e293b/c5a059?text=T'">
+    <link rel="icon"  href="{{ url_for('static', filename='assets/icons/icon_nbg.png') }}" type="image/x-icon" onerror="this.href='https://placehold.co/32x32/1e293b/c5a059?text=T'">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Silent Google Translate Init -->
     <script type="text/javascript">
         function googleTranslateElementInit() {
           new google.translate.TranslateElement({
@@ -76,7 +71,6 @@
             top: 0 !important;
         }
 
-        /* Hide Google Translate frames & branding completely */
         .goog-te-banner-frame, 
         .goog-te-banner-frame.skiptranslate, 
         .skiptranslate, 
@@ -90,8 +84,10 @@
             color: #fff;
             padding: 40px;
             border-bottom: 4px solid var(--gold);
-            background-image: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+            /* background-image: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%); */
+            background-image: url('/static/assets/bgs/txt.jpg'); 
             position: relative;
+            background-size:cover;
             overflow: hidden;
         }
 
@@ -248,7 +244,7 @@
             border-radius: 4px;
         }
 
-        main { max-width: 1200px; margin: 40px auto; padding: 0 20px; min-height: 600px; }
+        main { max-width: 1200px; margin: 40px auto; padding: 0 10px; min-height: 600px; }
 
         .intro { 
             font-size: 1.25rem; 
@@ -504,6 +500,9 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        .-error{
+            background:red !important;
+        }
 
         .article-footer {
             display: flex;
@@ -537,6 +536,9 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 40px;
+        }
+        .main-logo{
+            max-height:80px;
         }
 
         @media (min-width: 992px) {
@@ -1041,7 +1043,7 @@
     <header class="header">
         <div class="tunu-desc">
             <div class="tunu-logo">
-                <i class="fas fa-book-open"></i>
+                <img class="main-logo" src=" {{ url_for('static', filename='assets/icons/icon_nbg.png') }}">
             </div>
             <div class="tunu-name">
                 <h1>THE TUNU JOURNAL</h1>
@@ -1060,16 +1062,16 @@
             <a class="nav-item" id="nav-search-trigger" href="#"><i class="fas fa-search"></i> SEARCH</a>
             <a class="nav-item" id="theme-toggle" href="#"><i class="fas fa-circle-half-stroke"></i> THEME</a>
             
-            <!-- Standard Premium Custom Dropdown Switcher Element -->
             <div class="lang-dropdown-container">
                 <i class="fas fa-globe"></i>
-                <select id="language-switcher" onchange="translatePage(this.value)">
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="fr">Français</option>
-                    <option value="de">Deutsch</option>
-                    <option value="zh-CN">简体中文</option>
-                    <option value="ar">العربية</option>
+                <select id="language-switcher" onchange="translatePage(this.value)" translate="no">
+                    <option value="en" translate="no">English</option>
+                    <option value="es" translate="no">Español</option>
+                    <option value="fr" translate="no">Français</option>
+                    <option value="de" translate="no">Deutsch</option>
+                    <option value="zh-CN" translate="no">简体中文</option>
+                    <option value="ar" translate="no">العربية</option>
+                    <option value="sw" translate='no'>Swahili</option>
                 </select>
             </div>
             
@@ -1137,7 +1139,7 @@
                     <li><a href="#" class="footer-action-link">Institutional Twitter</a></li>
                     <li><a href="#" class="footer-action-link">Academic RSS Feeds</a></li>
                     <li><a href="#" class="footer-action-link">Newsletter Sign-up</a></li>
-                    <li><a href="#" class="footer-action-link">Developer API</a></li>
+                    <li><a href="https://lutan-tech.is-great.org/?utm_source=tunujournal.com&utm_medium=footer_link" target="_blank" class="footer-action-link">Developer API</a></li>
                 </ul>
             </div>
         </div>
@@ -1148,12 +1150,27 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', ()=>{
+            const theme = localStorage.getItem('theme')
+            if(theme && theme == 'dark'){
+                document.body.classList.add('dark-theme')
+            } else{
+                document.body.classList.remove('dark-theme')
+            }
+        })
         const toast = document.getElementById('toast-notification');
         const toastMsg = document.getElementById('toast-message');
 
-        function showToast(message) {
+        function showToast(message, type) {
             toastMsg.textContent = message;
             toast.classList.add('show');
+            toast.classList.add('-' + type);
+            if(type && type == 'error'){
+                toast.innerHTML = `
+                <i class="fas fa-times-circle"></i>
+        <span id="toast-message">${message}.</span>
+                `
+            }
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
@@ -1171,6 +1188,7 @@
         themeToggle.addEventListener('click', (e) => {
             e.preventDefault();
             document.body.classList.toggle('dark-theme');
+            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light')
         });
 
         const searchOverlay = document.getElementById('search-overlay');
@@ -1226,7 +1244,7 @@
             if (link.getAttribute('href') === '#') {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    showToast("Displaying policy document context.");
+                    showToast(link.textContent + " page not found.", 'error');
                 });
             }
         });

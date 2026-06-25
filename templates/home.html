@@ -5,7 +5,7 @@
     {% for cat in categories %}
     <section class="category-block" style="border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
         <!-- Category Banner Header -->
-        <div class="category-banner" style="background: var(--header-bg); border-bottom: 3px solid var(--gold); padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+        <div class="category-banner" style="background: var(--header-bg); border-bottom: 3px solid var(--gold); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <div>
                 <span class="badge" style="background: rgba(197, 160, 89, 0.2); color: var(--gold); margin-bottom: 5px;">Academic Discipline</span>
                 <h2 style="color: #ffffff; font-size: 1.8rem; letter-spacing: 0.05em; font-family: 'Georgia', serif; font-weight: 700; margin: 0;">{{ cat.name }}</h2>
@@ -16,7 +16,7 @@
         </div>
 
         <!-- Category Description Body -->
-        <div class="category-body" style="padding: 30px;">
+        <div class="category-body" style="padding: 10px;">
             {% if cat.latest_volume %}
                 <p style="font-style: italic; opacity: 0.85; margin-bottom: 25px; border-left: 3px solid var(--gold); padding-left: 15px; color: var(--ink);">
                     {{ cat.latest_volume.desc }}
@@ -48,7 +48,7 @@
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; flex-wrap: wrap; gap: 10px;">
                                     <div class="keywords-list" style="display: flex; gap: 6px;">
                                         {% for kw in art.keywords %}
-                                        <span class="keyword-tag" style="font-size: 0.7rem; padding: 2px 6px;">{{ kw }}</span>
+                                        <span class="keyword-tag" style="font-size: 0.7rem; padding: 2px 6px;"> <i class="fas fa-tags"></i> {{ kw }}</span>
                                         {% endfor %}
                                     </div>
                                     <a href="{{ url_for('article_detail', volume_id=cat.latest_volume.id, issue_id=cat.current_issue.id, article_id=art.id) }}" class="btn-link" style="font-size: 0.75rem; padding: 5px 12px;">Read Full Paper</a>
