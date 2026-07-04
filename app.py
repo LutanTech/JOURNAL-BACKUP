@@ -54,7 +54,7 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads", "articles")
 
 app = Flask(__name__)
 
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", os.getenv('SK'))
+app.config["SECRET_KEY"] = 'VERY_SECURE_SECRET_KEY'
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, "tunu_journal.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -568,23 +568,45 @@ def login():
         redirect_uri=url_for("callback", _external=True)
     )
 
-    auth_url, _ = flow.authorization_url(prompt="consent")
+    auth_url, state = flow.authorization_url(
+        prompt="consent",
+        access_type="offline",
+        include_granted_scopes="true"
+    )
+
+    session["google_state"] = state
+    session["google_code_verifier"] = flow.code_verifier
+
     return redirect(auth_url)
+
 
 @app.route("/google/callback")
 def callback():
+    if (
+        "google_state" not in session or
+        "google_code_verifier" not in session
+    ):
+        flash("Google login session expired. Please try again.", "error")
+        return redirect(url_for("home"))
+
     flow = Flow.from_client_secrets_file(
         GOOGLE_CLIENT_SECRETS_FILE,
         scopes=SCOPES,
+        state=session["google_state"],
         redirect_uri=url_for("callback", _external=True)
     )
 
+    flow.code_verifier = session["google_code_verifier"]
+
     flow.fetch_token(authorization_response=request.url)
+
     credentials = flow.credentials
 
     user_info = requests.get(
         "https://www.googleapis.com/oauth2/v3/userinfo",
-        headers={"Authorization": f"Bearer {credentials.token}"}
+        headers={
+            "Authorization": f"Bearer {credentials.token}"
+        }
     ).json()
 
     google_id = user_info["sub"]
@@ -592,10 +614,6 @@ def callback():
     name = user_info["name"]
 
     user = User.query.filter_by(google_id=google_id).first()
-    
-    if not user.is_active:
-        flash('Your account has been suspended. Please contact support', 'error') 
-        return redirect(url_for('home'))
 
     if not user:
         user = User(
@@ -610,20 +628,24 @@ def callback():
         db.session.add(user)
         db.session.commit()
 
+    elif not user.is_active:
+        flash("Your account has been suspended. Please contact support.", "error")
+        return redirect(url_for("home"))
+
     user.tkv = gen_id("TK", 10)
     db.session.commit()
 
     token = generate_token(user.id, user.tkv)
 
-    session['user_id'] = user.id
-    session['token'] = token
-    session['user_name'] = user.name
-    
-    flash('Logged in Successfully')
-    return redirect(
-        url_for('dashboard')
-    )
+    session["user_id"] = user.id
+    session["token"] = token
+    session["user_name"] = user.name
 
+    session.pop("google_state", None)
+    session.pop("google_code_verifier", None)
+
+    flash("Logged in Successfully", "success")
+    return redirect(url_for("dashboard"))
 # DEFAULT FILES
 
 @app.route("/search")
