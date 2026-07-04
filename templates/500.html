@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}500 Anomaly - Tunu Journal Archive{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>500 Anomaly</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 80px 20px; max-width: 600px; margin: 0 auto;">
+    <div style="font-size: 6rem; color: var(--gold); font-family: 'Georgia', serif; line-height: 1; margin-bottom: 20px; font-weight: bold;">
+        500
+    </div>
+    <h2 style="font-size: 2rem; color: var(--accent); margin-bottom: 15px; font-weight: normal;">Archival Processing Anomaly</h2>
+    <p style="font-size: 1.1rem; opacity: 0.8; margin-bottom: 30px; font-style: italic; line-height: 1.7;">
+        A severe computational exception or database lookup failure occurred while processing this request. The system's technical gatekeepers have been notified of this internal server state.
+    </p>
+
+    <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 25px; text-align: left; margin-bottom: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; align-items: start; gap: 15px;">
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(231, 76, 60, 0.1); color: #e74c3c; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+            <i class="fas fa-triangle-exclamation"></i>
+        </div>
+        <div>
+            <h4 style="font-size: 1rem; color: var(--accent); margin-bottom: 5px; font-family: sans-serif;">Researcher Diagnostics</h4>
+            <p style="font-size: 0.85rem; opacity: 0.75; line-height: 1.5; margin-bottom: 0;">
+                This error state is typically temporal. We recommend clearing your active session cookies, re-authenticating your scholar workspace, or trying your request again shortly.
+            </p>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+        <a href="{{ url_for('home') }}" class="btn-link">Return to Homepage</a>
+        <a href="mailto:support@tunujournal.com?subject=Tunu%20Journal%20500%20Error%20Report" class="btn-link" style="border-color: var(--gold); color: var(--gold); display: inline-flex; align-items: center; gap: 8px;">
+            <i class="fas fa-paper-plane"></i> Report Repository Exception
+        </a>
+    </div>
+</div>
+{% endblock %}

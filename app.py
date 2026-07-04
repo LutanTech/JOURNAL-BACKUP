@@ -387,6 +387,13 @@ def push_system_log(uid, code, level, message):
 def page_not_found(error):
     return render_template("404.html"), 404
 
+    
+@app.errorhandler(500)
+def internal_server_error(error):
+    flash("An internal server error occurred. Please try again later.", "error")
+    return render_template("500.html"), 500
+
+
 @app.errorhandler(413)
 def file_too_large(error):
     flash("That PDF is too large. Maximum allowed size is 25MB.")
@@ -1740,4 +1747,4 @@ if __name__ == "__main__":
         db.create_all()
 
     print("app.run(debug=True)")
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    # app.run(debug=True, host="0.0.0.0", port=5000)
