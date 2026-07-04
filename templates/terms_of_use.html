@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>Terms of Use</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Legal & Regulatory Framework</span>
+    <h2>Terms of Use</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Please read these terms of service carefully before accessing our archival repositories or initiating manuscript submissions.</p>
+</div>
+
+<div class="article-view-layout">
+    <div class="article-full-content">
+        <div class="article-body-text">
+            <h3>1. Agreement to Terms</h3>
+            <p>By accessing, browsing or utilizing the computational networks, databases and digital interfaces of the Tunu Journal (collectively referred to as the "Service"), you agree to be bound by these Terms of Use, all applicable local laws and global academic preservation protocols. If you do not agree with any of these terms, you are prohibited from utilizing this portal.</p>
+
+            <h3>2. Intellectual Property & Archival Licensing</h3>
+            <p>Except where otherwise explicitly declared, all manuscripts, peer-reviewed articles, dataset tables, metadata indices and typography elements published within this repository are issued under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license.</p>
+            <p>Under this legal framework, readers and institutions are permitted to:</p>
+            <ul>
+                <li><strong>Share:</strong> Copy, distribute and transmit the published literature in any medium or format.</li>
+                <li><strong>Adapt:</strong> Remix, transform and build upon the material for non-commercial purposes.</li>
+            </ul>
+            <p>Proper attribution to the original authors and the Tunu Journal must be provided in all citations. Commercial exploitation of any material stored here is strictly prohibited without formal prior authorization from Tunu Publishers.</p>
+
+            <h3>3. Submission of Manuscripts</h3>
+            <p>When you file a manuscript draft, abstract or dataset package through our Scholar Workspace, you explicitly guarantee that:</p>
+            <ul>
+                <li>The research is original, has not been published elsewhere and is not currently under review by another scientific venue.</li>
+                <li>You have secured all necessary permissions for copyright-protected figures, maps or code integrated into your draft.</li>
+                <li>The data does not violate the personal privacy, safety or intellectual property rights of any human subjects or institutions.</li>
+            </ul>
+            <p>Upon final acceptance of a manuscript by our editorial board, authors grant Tunu Publishers a non-exclusive, perpetual, worldwide license to format, preserve, index and publish the work across all print-on-demand and open-access networks.</p>
+
+            <h3>4. User Accounts & Security</h3>
+            <p>To submit manuscripts or manage evaluations, scholars must register an account, which utilizes our single-use email verification code (OTP) system. You are entirely responsible for maintaining the confidentiality of your credentials and protecting your authenticated sessions.</p>
+            <p>Administrators reserve the right to suspend, terminate or restrict user access profiles immediately upon detecting fraudulent profile credentials, systematic data-scraping abuses, spamming or violations of blind-review ethical standards.</p>
+
+            <h3>5. User Conduct and Code of Ethics</h3>
+            <p>You agree not to engage in any activity that degrades the security, integrity or speed of our databases. Specifically, you are prohibited from:</p>
+            <ul>
+                <li>Employing automated crawling bots, spiders or scrapers to extract high-volume PDF payloads or bulk system assets.</li>
+                <li>Attempting to bypass the single-use OTP framework or security tokens.</li>
+                <li>Engaging in academic misconduct, including plagiarism, duplicate publication, data fabrication or attempting to compromise anonymous reviewer panels.</li>
+            </ul>
+
+            <h3>6. Disclaimer of Warranties</h3>
+            <p>The documents and metadata published through our Service are provided "as is" and "as available" for scholastic archival search purposes. While we maintain rigid double-blind peer reviews, Tunu Publishers makes no warranties, expressed or implied, regarding the continuous availability of servers, the absolute accuracy of scientific measurements or the absence of digital archive vulnerabilities.</p>
+
+            <h3>7. Governing Law & Jurisdiction</h3>
+            <p>These terms and any legal actions arising from the use of our services shall be governed by and construed in accordance with the laws of Kenya. Any disputes arising directly from your activities on this portal shall be resolved exclusively within the high courts of Nairobi, Kenya.</p>
+        </div>
+    </div>
+
+    <div class="article-sidebar">
+        <div class="sidebar-widget">
+            <h4>Document Info</h4>
+            <p style="margin-bottom: 8px;"><strong>Version:</strong> 1.2</p>
+            <p style="margin-bottom: 8px;"><strong>Last Updated:</strong> June 2026</p>
+            <p style="margin-bottom: 8px;"><strong>Publisher:</strong> Tunu Publishers</p>
+            <p style="margin-bottom: 15px;"><strong>Jurisdiction:</strong> Nairobi, Kenya</p>
+            <a href="{{ url_for('about') }}" class="btn-link" style="display: block; text-align: center;">About the Journal</a>
+        </div>
+
+        <div class="sidebar-widget">
+            <h4>Need Clarification?</h4>
+            <p style="font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px;">
+                If you have questions regarding the Creative Commons license parameters, data extraction policies or institutional distribution agreements, contact our legal desk.
+            </p>
+            <p style="font-size: 0.85rem; margin-bottom: 5px;"><strong>Email:</strong> legal@tunujournal.com</p>
+            <p style="font-size: 0.85rem;"><strong>Support:</strong> support@tunujournal.com</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

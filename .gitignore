@@ -4,3 +4,6 @@ instance/
 /tunu_journal.db
 tunu_journal.db
 .vscode
+migrations
+.vscode
+client_secret.json

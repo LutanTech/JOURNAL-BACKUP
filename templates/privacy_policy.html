@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>Privacy Policy</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Data Protection Framework</span>
+    <h2>Privacy Policy</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">This privacy policy details our practices regarding the acquisition, protection and use of scholarly metadata, authentication credentials and submitted manuscripts.</p>
+</div>
+
+<div class="article-view-layout">
+    <div class="article-full-content">
+        <div class="article-body-text">
+            <h3>1. Scope of Data Collection</h3>
+            <p>To preserve academic works and coordinate double-blind peer evaluations, the Tunu Journal collects specific information from registered scholars, reviewers and visitors. This data includes:</p>
+            <ul>
+                <li><strong>Identity Metrics:</strong> Full academic name, institutional affiliation and professional email address.</li>
+                <li><strong>Academic Identifiers:</strong> Verified ORCID iDs and unique internal cryptographic account tokens.</li>
+                <li><strong>Submission Metadata:</strong> Manuscript titles, abstracts, keyword index sheets and uploaded PDF draft packages.</li>
+                <li><strong>Technical Credentials:</strong> Single-use authentication codes (OTP), phone contact numbers and session audit logs.</li>
+            </ul>
+
+            <h3>2. Purposes of Processing</h3>
+            <p>Your personal data and research materials are processed strictly to maintain archival and editorial integrity. The processing operations cover:</p>
+            <ul>
+                <li>Validating and securing administrative sessions inside your Scholar Workspace.</li>
+                <li>Coordinating the anonymous evaluation of manuscripts during the double-blind peer-review cycle.</li>
+                <li>Delivering critical status updates, validation codes and publication proofs via our email system.</li>
+                <li>Transmitting approved academic announcements or call-for-papers broadcasts if you have consented to join our unified communications stream.</li>
+            </ul>
+
+            <h3>3. Double-Blind Review Confidentiality</h3>
+            <p>To protect the objectivity of our evaluations, author identity markers and reviewer profile details are strictly isolated. No personal identifiers, email addresses or institutional affiliations are disclosed across the peer-evaluation channels. Reviewer feedback reports are rendered completely anonymous before being displayed in the author workspace or delivered via system updates.</p>
+
+            <h3>4. Manuscript Security and Preservation</h3>
+            <p>Submitted research documents, abstracts and metadata packages are stored within our secure, sandboxed server directories. Access to unpublished manuscripts is restricted to assigned editors and administrative gatekeepers. Once accepted and published under our Creative Commons framework, literature and metadata are archived on our replicated database nodes to prevent historical data loss or corruption.</p>
+
+            <h3>5. Data Sharing and Third-Party Disclosures</h3>
+            <p>The Tunu Journal does not sell, trade or distribute your identity markers, contact details or unpublished drafts to commercial third parties. Metadata corresponding to published works is shared exclusively with official global citation indexers, digital object identifier (DOI) registrars and public library systems to maximize research discoverability.</p>
+
+            <h3>6. User Rights and Suspensions</h3>
+            <p>Registered scholars retain complete control over their profile metadata. From your scholar settings panel, you can access, update or correct your credentials. Authors can request to suspend their account access or withdraw pending, unpublished manuscripts from the active review channel by writing to our administrative support desk.</p>
+
+            <h3>7. Regional Legal Compliance</h3>
+            <p>Our security practices and data management frameworks are constructed to comply strictly with the Kenya Data Protection Act. Any questions, compliance audits or data protection concerns arising from the use of our digital platforms shall be evaluated under Nairobi legal jurisdiction.</p>
+        </div>
+    </div>
+
+    <div class="article-sidebar">
+        <div class="sidebar-widget">
+            <h4>Policy Metadata</h4>
+            <p style="margin-bottom: 8px;"><strong>Version:</strong> 1.1</p>
+            <p style="margin-bottom: 8px;"><strong>Effective Date:</strong> June 2026</p>
+            <p style="margin-bottom: 8px;"><strong>Data Controller:</strong> Tunu Publishers</p>
+            <p style="margin-bottom: 15px;"><strong>Jurisdiction:</strong> Nairobi, Kenya</p>
+            <a href="{{ url_for('about') }}" class="btn-link" style="display: block; text-align: center;">Journal Overview</a>
+        </div>
+
+        <div class="sidebar-widget">
+            <h4>Data Protection Officer</h4>
+            <p style="font-size: 0.85rem; line-height: 1.5; margin-bottom: 10px;">
+                If you have inquiries regarding how we handle metadata, secure database transactions or manage your right to have profile parameters updated, contact our office.
+            </p>
+            <p style="font-size: 0.85rem;"><strong>Support:</strong> support@tunujournal.com</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

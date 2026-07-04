@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE TUNU JOURNAL | Verify OTP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --paper: #f9f7f2;
+            --ink: #1a1a1a;
+            --accent: #2c3e50;
+            --border: #d4d4d4;
+            --header-bg: #1e293b;
+            --card-bg: #ffffff;
+            --gold: #c5a059;
+        }
+
+        body.dark-theme {
+            --paper: #121212;
+            --ink: #e0e0e0;
+            --accent: #c5a059;
+            --border: #333333;
+            --header-bg: #0f172a;
+            --card-bg: #1e1e1e;
+        }
+
+        * { padding: 0; margin: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--paper);
+            color: var(--ink);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .auth-header i {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .auth-header h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .auth-header p {
+            font-size: 0.9rem;
+            opacity: 0.75;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--paper);
+            color: var(--ink);
+            font-size: 1.5rem;
+            letter-spacing: 8px;
+            text-align: center;
+            outline: none;
+            font-family: monospace;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            font-family: sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--gold);
+            border: 1px solid var(--gold);
+            color: #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background: var(--ink);
+            border-color: var(--ink);
+        }
+
+        .alert {
+            background: #fdf2f2;
+            border: 1px solid #f5baba;
+            color: #de3b3b;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            font-family: sans-serif;
+        }
+        .notif{
+            border-left: 4px solid var(--gold);
+            padding: 15px 20px;
+            font-size: 0.9rem;
+            font-family: sans-serif;
+            display: flex; align-items:
+            center; gap: 10px;
+            }
+            .-error-msg{
+                background: #ff000091;
+                color: #ffffff;
+            }
+            .-success-msg{
+            background: #77ff77;
+            color: black;
+            }
+            .-info-msg{
+            background: #7979ff ;
+            color:white;
+            }
+            .-warning-msg{
+            background: #ffb20087;
+            color:black;
+            }
+            
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-shield-halved"></i>
+            <h2>Security Verification</h2>
+            <p>Please enter the 6-digit verification code transmitted to your email address.</p>
+        </div>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:25px;">
+            {% for category, message in messages %}
+                <div class="notif{% if category == 'error' %} -error-msg{% elif category == 'success' %} -success-msg{% elif category == 'warning' %} -warning-msg{% elif category == 'info' %} -info-msg{% endif %}">
+                    <i class="fas{% if category == 'error' %} fa-close{% elif category == 'success' %} fa-check-circle{% elif category == 'warning' %} fa-warning{% elif category == 'info' %} fa-info-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+        <form action="{{ url_for('verify_otp') }}" method="POST">
+            <div class="form-group">
+                <input type="text" name="otp" class="form-control" required maxlength="6" autocomplete="off" placeholder="000000">
+            </div>
+            <button type="submit" class="btn-submit">Verify Code</button>
+        </form>
+
+        <div style="margin-top: 25px; font-size: 0.85rem; opacity: 0.7;">
+            Didn't obtain a code? <a href="{{ url_for('resend_otp') }}" style="color: var(--gold); text-decoration: none; font-weight: bold;">Request another</a>
+        </div>
+    </div>
+</body>
+</html>

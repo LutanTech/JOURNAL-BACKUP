@@ -1,0 +1,509 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>Scholar Dashboard</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<style>
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    @media (min-width: 992px) {
+        .dashboard-grid {
+            grid-template-columns: 280px 1fr;
+        }
+    }
+    .profile-sidebar {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 25px;
+        align-self: start;
+    }
+    @media (min-width: 992px) {
+        .profile-sidebar {
+            position: sticky;
+            top: 90px;
+        }
+    }
+    .main-workspace {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+    .metric-bar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+    @media (min-width: 576px) {
+        .metric-bar {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    .metric-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+    .metric-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: rgba(197, 160, 89, 0.1);
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+    .metric-info h4 {
+        font-size: 1.4rem;
+        color: var(--accent);
+        line-height: 1.1;
+    }
+    .metric-info p {
+        font-size: 0.75rem;
+        font-family: sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0.7;
+    }
+    .tab-nav {
+        display: flex;
+        border-bottom: 2px solid var(--border);
+        gap: 5px;
+        flex-wrap: wrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tab-btn {
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: var(--ink);
+        opacity: 0.7;
+        font-family: sans-serif;
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 10px 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: -2px;
+        white-space: nowrap;
+    }
+    @media (min-width: 768px) {
+        .tab-btn {
+            font-size: 0.85rem;
+            padding: 12px 16px;
+        }
+    }
+    .tab-btn:hover {
+        opacity: 1;
+        color: var(--gold);
+    }
+    .tab-btn.active {
+        opacity: 1;
+        color: var(--gold);
+        border-bottom-color: var(--gold);
+    }
+    .tab-panel {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+    .tab-panel.active {
+        display: block;
+    }
+    .manuscript-node {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    @media (min-width: 768px) {
+        .manuscript-node {
+            padding: 25px;
+        }
+    }
+    .manuscript-node:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.03);
+    }
+    .badge-status {
+        font-family: sans-serif;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 3px 8px;
+        border-radius: 3px;
+        display: inline-block;
+    }
+    .status-pending { background: rgba(243, 156, 18, 0.1); color: #d35400; }
+    .status-review { background: rgba(52, 152, 219, 0.1); color: #2980b9; }
+    .status-accepted { background: rgba(46, 204, 113, 0.1); color: #27ae60; }
+    .status-rejected { background: rgba(231, 76, 60, 0.1); color: #c0392b; }
+    
+    .form-grid-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    @media (min-width: 768px) {
+        .form-grid-row {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    
+    .ql-toolbar.ql-snow {
+        border: 1px solid var(--border) !important;
+        background: var(--paper) !important;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+    .ql-container.ql-snow {
+        border: 1px solid var(--border) !important;
+        background: var(--paper) !important;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        min-height: 180px;
+    }
+    .ql-editor {
+        color: var(--ink) !important;
+    }
+    .ql-editor.ql-blank::before {
+        color: var(--ink) !important;
+        opacity: 0.5;
+        font-style: normal;
+    }
+    .ql-snow .ql-stroke {
+        stroke: var(--ink) !important;
+    }
+    .ql-snow .ql-fill {
+        fill: var(--ink) !important;
+    }
+    .ql-snow .ql-picker {
+        color: var(--ink) !important;
+    }
+    .ql-snow .ql-picker-options {
+        background-color: var(--paper) !important;
+        border-color: var(--border) !important;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .additional-link{
+        color: var(--ink);
+        text-decoration: none;
+        display: flex;
+        border-radius:5px
+    
+    }
+</style>
+
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Authorized Session</span>
+    
+    <h2>Scholar Workspace</h2>
+    <p style="opacity: 0.8; margin-top: 5px;">Manage research manuscripts, track peer evaluations, and update academic credentials.</p>
+</div>
+
+
+<div class="dashboard-grid">
+    <aside class="profile-sidebar">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: var(--gold); color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: bold; margin: 0 auto 15px auto;">
+                {{ user.name[0] }}
+            </div>
+            <h3 translate="no" style="font-size: 1.25rem; color: var(--accent); line-height: 1.2;">{{ user.name }}</h3>
+            <span class="badge" style="margin-top: 8px; font-size: 0.65rem;">{{ user.role | upper }}</span>
+        </div>
+
+        <div style="border-top: 1px solid var(--border); padding-top: 20px; display: flex; flex-direction: column; gap: 15px; font-size: 0.85rem;">
+            <div>
+                <p style="font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; opacity: 0.6; font-weight: 600;">Scholar Email</p>
+                <p style="font-weight: 600; word-break: break-all;">{{ user.email }}</p>
+            </div>
+            <div>
+                <p style="font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; opacity: 0.6; font-weight: 600;">Affiliation</p>
+                <p style="font-weight: 600;">{{ user.institution or 'Not Configured' }}</p>
+            </div>
+            <div>
+                <p style="font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; opacity: 0.6; font-weight: 600;">ORCID Identifier</p>
+                {% if user.orcid_id %}
+                <p style="font-weight: 600; color: #a6ce39;"><i class="fab fa-orcid"></i> {{ user.orcid_id }}</p>
+                {% else %}
+                <p style="font-style: italic; opacity: 0.5;">No verified ORCID</p>
+                {% endif %}
+            </div>
+            <div>
+                <p style="font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; opacity: 0.6; font-weight: 600;">Account ID</p>
+                <p style="font-family: monospace; font-size: 0.8rem; background: var(--paper); padding: 2px 6px; border-radius: 3px; display: inline-block;">{{ user.uid }}</p>
+            </div>
+        </div>
+    </aside>
+
+    <section class="main-workspace">
+        <div class="metric-bar">
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fas fa-file-invoice"></i></div>
+                <div class="metric-info">
+                    <h4>{{ submissions | length }}</h4>
+                    <p>Submissions</p>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="metric-info">
+                    {% set pending = namespace(val=0) %}
+                    {% for sub in submissions %}
+                        {% if sub.status == 'Pending' or sub.status == 'Under Review' %}
+                            {% set pending.val = pending.val + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    <h4>{{ pending.val }}</h4>
+                    <p>In Review</p>
+                </div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-icon"><i class="fas fa-award"></i></div>
+                <div class="metric-info">
+                    {% set accepted = namespace(val=0) %}
+                    {% for sub in submissions %}
+                        {% if sub.status == 'Accepted' %}
+                            {% set accepted.val = accepted.val + 1 %}
+                        {% endif %}
+                    {% endfor %}
+                    <h4>{{ accepted.val }}</h4>
+                    <p>Approved</p>
+                </div>
+            </div>
+            {% if user.is_admin %}<a class="additional-link" href="{{ url_for('admin_portal') }}">
+                        <div class="metric-card">
+                            <div class="metric-icon"><i class="fas fa-mask"></i></div>
+                            <div class="metric-info">
+                                Admin Portal
+                            </div>
+                        </div></a>
+            {% endif %}
+        </div>
+
+        <div class="tab-nav">
+            <button class="tab-btn" onclick="switchTab(event, 'submissions-tab')">Active Manuscripts</button>
+            <button class="tab-btn active" onclick="switchTab(event, 'new-submission-tab')">Submit Draft</button>
+            <button class="tab-btn" onclick="switchTab(event, 'profile-settings-tab')">Profile Metadata</button>
+            
+        </div>
+
+        <div id="submissions-tab" class="tab-panel">
+            {% if submissions | length == 0 %}
+            <div style="text-align: center; padding: 50px 20px; border: 1px dashed var(--border); border-radius: 6px; background: var(--card-bg);">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--gold); opacity: 0.6; margin-bottom: 15px;"></i>
+                <h4 style="font-size: 1.15rem; color: var(--accent);">No Manuscripts Discovered</h4>
+                <p style="max-width: 450px; margin: 8px auto 0 auto; font-size: 0.9rem; opacity: 0.7;">You have not launched any research submission channels in this workspace yet. Select "Submit Draft" above to begin.</p>
+            </div>
+            {% else %}
+                {% for sub in submissions %}
+                <div class="manuscript-node">
+                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 15px; flex-wrap: wrap; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 15px;">
+                        <div style="max-width: 100%;">
+                            <span style="font-family: monospace; font-size: 0.75rem; color: var(--gold); font-weight: bold; background: var(--paper); padding: 2px 6px; border-radius: 3px; display: inline-block; word-break: break-all;">{{ sub.id }}</span>
+                            <h4 style="font-size: 1.25rem; color: var(--accent); margin-top: 5px; word-break: break-word;">{{ sub.title }}</h4>
+                        </div>
+                        <div>
+                            {% if sub.status == 'Pending' %}
+                            <span class="badge-status status-pending">Pending Audit</span>
+                            {% elif sub.status == 'Under Review' %}
+                            <span class="badge-status status-review">In Peer Review</span>
+                            {% elif sub.status == 'Accepted' %}
+                            <span class="badge-status status-accepted">Approved / Scheduled</span>
+                            {% else %}
+                            <span class="badge-status status-rejected">{{ sub.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="font-size: 0.9rem; opacity: 0.8; line-height: 1.6; margin-bottom: 15px; word-break: break-word;">
+                        <strong>Abstract:</strong> {{ sub.abstract[:200] + '...' | safe }}
+                    </div>
+                    {% if sub.pdf_url %}
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <a href="{{ url_for('download_submission_pdf', submission_id=sub.id) }}" target="_blank" class="btn-link" style="font-size: 0.75rem; padding: 5px 12px; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-file-pdf" style="color: #e74c3c;"></i> Access Manuscript PDF
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <div id="new-submission-tab" class="tab-panel  active">
+            <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 20px 25px;">
+                <h3 style="font-size: 1.3rem; color: var(--accent); margin-bottom: 15px; border-bottom: 2px solid var(--gold); padding-bottom: 8px;">
+                    <i class="fas fa-pen-nib" style="color: var(--gold); margin-right: 8px;"></i> File New Research Manuscript
+                </h3>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 25px;">Please verify your draft meets the formatting guidelines corresponding to your target academic division prior to filing.</p>
+                
+                <form id="manuscript-submission-form" action="/submit" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Manuscript Title</label>
+                        <input type="text" name="title" required placeholder="Provide the exact full title of the research paper" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+                    </div>
+                    <div>
+                        <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Target Disciplinary Division</label>
+                        <select name="discipline" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none;">
+                            <option value="Kiswahili Studies">Kiswahili Studies</option>
+                            <option value="Education Studies">Education Studies</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Structured Abstract</label>
+                        <input type="hidden" name="abstract" id="abstract-input">
+                        <div id="abstract-editor"></div>
+                    </div>
+                    <div>
+                        <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Manuscript File (PDF format exclusively)</label>
+                        <input type="file" name="pdf" accept=".pdf" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+                    </div>
+                    <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 12px 30px;">Transmit Manuscript Packet</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="profile-settings-tab" class="tab-panel">
+            <div style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 20px 25px;">
+                <h3 style="font-size: 1.3rem; color: var(--accent); margin-bottom: 15px; border-bottom: 2px solid var(--gold); padding-bottom: 8px;">
+                    <i class="fas fa-id-card-clip" style="color: var(--gold); margin-right: 8px;"></i> Scholar Profile Metadata
+                </h3>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 25px;">Keep your institutional affiliations and unique identifier credentials standard to verify publication metadata blocks correctly.</p>
+
+                <form id="profile-update-form" action="/api/update-profile" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="form-grid-row">
+                        <div>
+                            <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Display Name</label>
+                            <input type="text" name="name" value="{{ user.name }}" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Phone Number</label>
+                            <input type="text" name="phone" value="{{ user.phone or '' }}" placeholder="e.g. +254 722 000000" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+                        </div>
+                    </div>
+                    <div class="form-grid-row">
+                        <div>
+                            <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Institutional Affiliation</label>
+                            <input type="text" name="institution" value="{{ user.institution or '' }}" required placeholder="e.g., Tunu University" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Verified ORCID iD</label>
+                            <input type="text" name="orcid" value="{{ user.orcid_id or '' }}" placeholder="e.g., 0000-0002-1825-0097" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 12px 30px;">Commit Profile Settings</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script>
+    const quill = new Quill('#abstract-editor', {
+        theme: 'snow',
+        placeholder: 'Maximum 250 words describing context, methodology, results, and scientific impacts...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                ['clean']
+            ]
+        }
+    });
+
+    document.getElementById('manuscript-submission-form').addEventListener('submit', function(e) {
+        const abstractInput = document.getElementById('abstract-input');
+        abstractInput.value = quill.root.innerHTML;
+    });
+
+    function switchTab(evt, tabId) {
+        const tabBtns = document.getElementsByClassName('tab-btn');
+        for (let i = 0; i < tabBtns.length; i++) {
+            tabBtns[i].classList.remove('active');
+        }
+
+        const tabPanels = document.getElementsByClassName('tab-panel');
+        for (let i = 0; i < tabPanels.length; i++) {
+            tabPanels[i].classList.remove('active');
+        }
+
+        evt.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    document.getElementById('profile-update-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Saving...";
+        showToast("Updating profile settings...");
+
+        const data = {
+            name: form.querySelector('[name="name"]').value,
+            phone: form.querySelector('[name="phone"]').value,
+            institution: form.querySelector('[name="institution"]').value,
+            orcid: form.querySelector('[name="orcid"]').value
+        };
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('token') || ''
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.error || 'Update failed') });
+            }
+            return response.json();
+        })
+        .then(data => {
+            showToast("Scholar profile parameters updated successfully.");
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        })
+        .catch(err => {
+            showToast("Error: " + err.message);
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Commit Profile Settings";
+        });
+    });
+</script>
+{% endblock %}

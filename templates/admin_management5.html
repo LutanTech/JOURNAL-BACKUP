@@ -1,0 +1,964 @@
+{% extends 'base.html' %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a href="{{ url_for('admin_portal') }}">System Administration</a>
+<span>/</span>
+<a>Console Management</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+{% if session.get('admin_logged_in') %}
+
+<style>
+    .admin-nav-link {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--ink);
+        font-family: sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 12px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .admin-nav-link:hover {
+        background: rgba(0, 0, 0, 0.03);
+    }
+    body.dark-theme .admin-nav-link:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .admin-nav-link.active {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: #ffffff;
+    }
+    .management-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    @media (min-width: 992px) {
+        .management-grid {
+            grid-template-columns: 240px 1fr;
+        }
+    }
+    .management-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .side-tab-btn {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        color: var(--ink);
+        padding: 15px 20px;
+        text-align: left;
+        border-radius: 4px;
+        cursor: pointer;
+        font-family: sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.2s ease;
+    }
+    .side-tab-btn:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+    .side-tab-btn.active {
+        background: var(--gold);
+        color: #ffffff;
+        border-color: var(--gold);
+    }
+    .management-panel {
+        display: none;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 30px;
+        animation: panelFade 0.25s ease;
+    }
+    .management-panel.active {
+        display: block;
+    }
+    
+    .rte-btn:hover {
+        background: rgba(0, 0, 0, 0.05) !important;
+    }
+    body.dark-theme .rte-btn:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+    #broadcast-editor:empty::before {
+        content: "Begin composing your broadcast message here...";
+        color: #a0aec0;
+        font-style: italic;
+    }
+    #broadcast-editor h2 {
+        font-size: 1.6rem;
+        color: var(--accent);
+        margin: 20px 0 10px 0;
+    }
+    #broadcast-editor h3 {
+        font-size: 1.3rem;
+        color: var(--accent);
+        margin: 15px 0 8px 0;
+    }
+    #broadcast-editor p {
+        margin-bottom: 15px;
+    }
+    #broadcast-editor ul, #broadcast-editor ol {
+        margin-bottom: 15px;
+        padding-left: 25px;
+    }
+    
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin-top: 15px;
+    }
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        background: var(--card-bg);
+    }
+    .admin-table th, .admin-table td {
+        padding: 14px 18px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        vertical-align: middle;
+    }
+    .admin-table th {
+        background: var(--paper);
+        font-family: sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--gold);
+    }
+    .admin-table tr:last-child td {
+        border-bottom: none;
+    }
+    .admin-table tr:hover {
+        background: rgba(0, 0, 0, 0.015);
+    }
+    body.dark-theme .admin-table tr:hover {
+        background: rgba(255, 255, 255, 0.015);
+    }
+
+    .table-controls-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 15px;
+        font-family: sans-serif;
+        font-size: 0.85rem;
+    }
+    .per-page-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .per-page-select {
+        padding: 6px 12px;
+        border: 1px solid var(--border);
+        background: var(--paper);
+        color: var(--ink);
+        border-radius: 4px;
+        font-family: sans-serif;
+        font-size: 0.8rem;
+        outline: none;
+        cursor: pointer;
+    }
+    .pagination-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        font-family: sans-serif;
+        font-size: 0.85rem;
+        justify-content: space-between;
+        border-top: 1px solid var(--border);
+        padding-top: 15px;
+    }
+    .pagination-buttons {
+        display: flex;
+        gap: 5px;
+    }
+
+    .tags-helper-panel {
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 15px;
+        margin-top: 8px;
+    }
+    .tags-helper-label {
+        font-family: sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--gold);
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+        display: block;
+    }
+    .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .tag-pill {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        color: var(--accent);
+        padding: 6px 14px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 0.85rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .tag-pill:hover {
+        border-color: var(--gold);
+        background: var(--gold);
+        color: #ffffff;
+    }
+
+    .log-row {
+        font-family: monospace;
+        font-size: 0.85rem;
+        padding: 12px 15px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .log-row:last-child {
+        border-bottom: none;
+    }
+    .log-tag {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-family: sans-serif;
+    }
+    .log-info { background: rgba(52, 152, 219, 0.15); color: #2980b9; }
+    .log-warning { background: rgba(241, 196, 15, 0.15); color: #d35400; }
+    .log-critical { background: rgba(231, 76, 60, 0.15); color: #c0392b; }
+    .badge-active { background: rgba(46, 204, 113, 0.15); color: #27ae60; }
+    .badge-deactivated { background: rgba(231, 76, 60, 0.15); color: #c0392b; }
+    
+    .maintenance-card {
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .action-select {
+        padding: 8px 12px;
+        font-family: sans-serif;
+        font-size: 0.8rem;
+        border: 1px solid var(--border);
+        background: var(--paper);
+        color: var(--ink);
+        border-radius: 4px;
+        outline: none;
+    }
+    
+    @keyframes panelFade {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="archive-details-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <div>
+        <span class="archive-details-subtitle">System Console</span>
+        <h2>Administration Control Panel</h2>
+    </div>
+    <a href="{{ url_for('admin_logout') }}" class="btn-link" style="border-color: #e74c3c; color: #e74c3c;"><i class="fas fa-sign-out-alt"></i> De-authenticate Session</a>
+</div>
+
+<div style="display: flex; gap: 10px; margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 20px; flex-wrap: wrap;">
+    <a class="admin-nav-link" href="{{ url_for('admin_portal') }}">
+        <i class="fas fa-list-check"></i> Inventory Overview
+    </a>
+    <a class="admin-nav-link" href="{{ url_for('admin_structure') }}">
+        <i class="fas fa-folder-plus"></i> Volumes & Issues
+    </a>
+    <a class="admin-nav-link" href="{{ url_for('admin_publish') }}">
+        <i class="fas fa-file-signature"></i> Publish Article
+    </a>
+    <a class="admin-nav-link" href="/admin/submissions">
+        <i class="fas fa-envelope-open-text"></i> Scholar Submissions
+    </a>
+    <a class="admin-nav-link active" href="/admin/management">
+        <i class="fas fa-gears"></i> Management
+    </a>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px;">
+            {% for message in messages %}
+                <div style="background: rgba(197, 160, 89, 0.1); border-left: 4px solid var(--gold); color: var(--ink); padding: 15px 20px; border-radius: 0 4px 4px 0; font-size: 0.9rem; font-family: sans-serif; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-info-circle" style="color: var(--gold);"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="management-grid">
+    <aside class="management-sidebar">
+        <button class="side-tab-btn active" onclick="switchManagementTab(event, 'tab-users')">
+            <i class="fas fa-users-cog"></i> Users & Roles
+        </button>
+        <button class="side-tab-btn" onclick="switchManagementTab(event, 'tab-marketing')">
+            <i class="fas fa-bullhorn"></i> Unified Communications
+        </button>
+        <button class="side-tab-btn" onclick="switchManagementTab(event, 'tab-logs')">
+            <i class="fas fa-terminal"></i> Database Security Logs
+        </button>
+        <button class="side-tab-btn" onclick="switchManagementTab(event, 'tab-maintenance')">
+            <i class="fas fa-screwdriver-wrench"></i> System Maintenance
+        </button>
+    </aside>
+
+    <div class="management-content">
+        <div id="tab-users" class="management-panel active">
+            <h3 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 10px; border-bottom: 2px solid var(--gold); padding-bottom: 10px;">
+                Scholar Registry & Role Matrix
+            </h3>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px;">Manage registered accounts, review administrative profiles, update security clearance levels, or send instant targeted alerts.</p>
+
+            <div class="table-controls-wrapper">
+                <div class="per-page-container">
+                    <span>Show</span>
+                    <select id="per-page-select" class="per-page-select" onchange="updatePageSize(this.value)">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="all">All</option>
+                    </select>
+                    <span>scholars per page</span>
+                </div>
+                <div style="opacity: 0.7;" id="table-metrics">
+                    Showing 0 to 0 of 0 registered users
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="admin-table" id="scholars-table">
+                    <thead>
+                        <tr>
+                            <th>Scholar Details</th>
+                            <th>Affiliation</th>
+                            <th>Role Configuration</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Workspace Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scholars-table-body">
+                        {% for u in users %}
+                        <tr class="scholar-row" data-name="{{ u.name }}" data-email="{{ u.email }}">
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <strong style="font-size: 0.95rem; color: var(--accent);">{{ u.name }}</strong>
+                                    <span style="font-size: 0.8rem; opacity: 0.75;"><i class="fas fa-envelope" style="font-size:0.75rem; margin-right:4px;"></i>{{ u.email }}</span>
+                                    {% if u.phone %}
+                                    <span style="font-size: 0.8rem; opacity: 0.75;"><i class="fas fa-phone" style="font-size:0.75rem; margin-right:4px;"></i>{{ u.phone }}</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size: 0.85rem;">{{ u.institution or 'None Specified' }}</div>
+                            </td>
+                            <td>
+                                <form action="/admin/user/role/{{ u.id }}" method="POST" style="margin: 0;">
+                                    <select name="role" class="action-select" onchange="this.form.submit()" style="font-size: 0.8rem; padding: 6px 10px;">
+                                        <option value="author" {% if u.role == 'author' %}selected{% endif %}>Author</option>
+                                        <option value="reviewer" {% if u.role == 'reviewer' %}selected{% endif %}>Reviewer</option>
+                                        <option value="editor" {% if u.role == 'editor' %}selected{% endif %}>Editor</option>
+                                        <option value="administrator" {% if u.role == 'administrator' %}selected{% endif %}>Administrator</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td>
+                                {% if u.is_active %}
+                                <span class="badge-status badge-active" style="padding: 3px 8px; font-size: 0.7rem; font-family: sans-serif; font-weight: bold; border-radius: 3px;">ACTIVE</span>
+                                {% else %}
+                                <span class="badge-status badge-deactivated" style="padding: 3px 8px; font-size: 0.7rem; font-family: sans-serif; font-weight: bold; border-radius: 3px;">SUSPENDED</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: inline-flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
+                                    <button type="button" class="btn-link" style="font-size: 0.75rem; padding: 6px 12px; border-color: var(--gold); color: var(--gold);" onclick="openDirectNotifyModal('{{ u.id }}', '{{ u.name }}')">
+                                        <i class="fas fa-bell"></i> Notify
+                                    </button>
+                                    <form action="/admin/user/toggle/{{ u.id }}" method="POST" style="margin: 0;">
+                                        <button type="submit" class="btn-link" style="font-size: 0.75rem; padding: 6px 12px; border-color: var(--border);">
+                                            {% if u.is_active %}
+                                            Suspend
+                                            {% else %}
+                                            Activate
+                                            {% endif %}
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-bar">
+                <span id="page-indicator">Page 1 of 1</span>
+                <div class="pagination-buttons">
+                    <button class="btn-link" id="btn-prev-page" onclick="changePage(-1)" style="font-size: 0.75rem; padding: 6px 12px;">
+                        <i class="fas fa-arrow-left"></i> Previous
+                    </button>
+                    <button class="btn-link" id="btn-next-page" onclick="changePage(1)" style="font-size: 0.75rem; padding: 6px 12px;">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-marketing" class="management-panel">
+            <h3 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 10px; border-bottom: 2px solid var(--gold); padding-bottom: 10px;">
+                Unified Broadcast Communications
+            </h3>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 25px;">Broadcast Announcements, Call-for-papers, or Security updates via dynamic SMS, Emails, or In-App Notification channels.</p>
+
+            <form action="/admin/marketing/broadcast" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+                <div>
+                    <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Transmission Protocol</label>
+                    <select id="marketing-channel-select" name="channel" onchange="toggleMarketingFields()" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none;">
+                        <option value="email">Email Broadcast (Flask-Mail)</option>
+                        <option value="sms">SMS Gateway (Africa's Talking Broker)</option>
+                        <option value="notification">In-App Dashboard Notification</option>
+                        <option value="omni">Omni-channel (Email + SMS + In-App Notification)</option>
+                    </select>
+                </div>
+                
+                <div id="notif-details-subpanel" style="display: none; background: var(--paper); border: 1px solid var(--border); padding: 15px; border-radius: 4px; display: flex; flex-direction: column; gap: 15px;">
+                    <h4 style="font-family: sans-serif; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--gold); margin: 0;">In-App Alert Configuration</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label style="display: block; font-family: sans-serif; font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; opacity: 0.8;">Display Category</label>
+                            <select name="notif_category" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--card-bg); color: var(--ink); outline: none;">
+                                <option value="system">System Alerts</option>
+                                <option value="manuscripts">Manuscript pipeline updates</option>
+                                <option value="alerts">Editorial / Urgent Notices</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-family: sans-serif; font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; opacity: 0.8;">Visual Icon Graphic</label>
+                            <select name="notif_icon" style="width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--card-bg); color: var(--ink); outline: none;">
+                                <option value="fa-info-circle">Information (i)</option>
+                                <option value="fa-bullhorn">Announcement (Megaphone)</option>
+                                <option value="fa-exclamation-triangle">Warning Triangle</option>
+                                <option value="fa-file-signature">Manuscript Document</option>
+                                <option value="fa-book-open">Academic Book Icon</option>
+                                <option value="fa-user-clock">User Appointment Clock</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Broadcast Target Group</label>
+                    <select name="target_role" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none;">
+                        <option value="all">All Registered Accounts</option>
+                        <option value="author">Authors Only</option>
+                        <option value="reviewer">Reviewers Only</option>
+                    </select>
+                </div>
+                <div>
+                    <label id="subject-heading-label" style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Subject Heading / Notification Title</label>
+                    <input type="text" name="subject" required placeholder="e.g. Call for Papers: Tunu Journal Issue 2" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
+                </div>
+                <div>
+                    <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Message Payload Content</label>
+                    
+                    <!-- Custom Rich Text Editor for Broadcast Message -->
+                    <div class="rte-container" style="border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); overflow: hidden; margin-bottom: 15px;">
+                        <!-- Editor Toolbar -->
+                        <div class="rte-toolbar" style="display: flex; align-items: center; flex-wrap: wrap; gap: 5px; padding: 10px 15px; border-bottom: 1px solid var(--border); background: var(--paper);">
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('bold')" title="Bold" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px; font-weight: bold; font-family: 'Georgia', serif;">B</button>
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('italic')" title="Italic" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px; font-style: italic; font-family: 'Georgia', serif;">I</button>
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('underline')" title="Underline" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px; text-decoration: underline; font-family: 'Georgia', serif;">U</button>
+                            
+                            <div style="width: 1px; height: 20px; background: var(--border); margin: 0 8px;"></div>
+                            
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('formatBlock', 'H2')" title="Heading 2" style="font-size: 0.85rem; font-weight: bold; padding: 0 6px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px; font-family: sans-serif;">H2</button>
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('formatBlock', 'H3')" title="Heading 3" style="font-size: 0.85rem; font-weight: bold; padding: 0 6px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px; font-family: sans-serif;">H3</button>
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('formatBlock', 'P')" title="Paragraph" style="font-size: 0.85rem; font-weight: bold; padding: 0 6px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px; font-family: sans-serif;">P</button>
+                            
+                            <div style="width: 1px; height: 20px; background: var(--border); margin: 0 8px;"></div>
+                            
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('insertUnorderedList')" title="Bullet List" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px;"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('insertOrderedList')" title="Numbered List" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px;"><i class="fas fa-list-ol"></i></button>
+                            
+                            <div style="width: 1px; height: 20px; background: var(--border); margin: 0 8px;"></div>
+                            
+                            <button type="button" class="rte-btn" onclick="addBroadcastLink()" title="Add Link" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px;"><i class="fas fa-link"></i></button>
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('unlink')" title="Remove Link" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: var(--ink); cursor: pointer; border-radius: 3px;"><i class="fas fa-unlink"></i></button>
+                            
+                            <div style="width: 1px; height: 20px; background: var(--border); margin: 0 8px;"></div>
+                            
+                            <button type="button" class="rte-btn" onclick="execBroadcastCmd('removeFormat')" title="Clear Formatting" style="width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: #ff4d4d; cursor: pointer; border-radius: 3px;"><i class="fas fa-eraser"></i></button>
+                        </div>
+                        
+                        <!-- Editor Editable Field -->
+                        <div id="broadcast-editor" contenteditable="true" style="min-height: 240px; padding: 25px; outline: none; overflow-y: auto; color: var(--ink); line-height: 1.8; font-family: 'Georgia', serif; background: var(--paper);" oninput="syncBroadcastContent()"></div>
+                    </div>
+                    
+                    <!-- Hidden textarea mapped to the backend form submit -->
+                    <textarea name="message" id="broadcast-message" required style="display: none;"></textarea>
+                    
+                    <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
+                        <button type="button" class="btn-link" id="preview-toggle-btn" onclick="toggleLivePreview()" style="font-size: 0.8rem; padding: 8px 16px; border-color: var(--border); display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-eye"></i> Show Live Preview
+                        </button>
+                        <button type="button" class="btn-link" id="preview-window-btn" onclick="previewInNewWindow()" style="font-size: 0.8rem; padding: 8px 16px; border-color: var(--border); display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-external-link-alt"></i> Preview in New Window
+                        </button>
+                    </div>
+
+                    <div id="live-preview-container" style="display: none; margin-top: 15px; border: 1px solid var(--gold); border-radius: 4px; background: var(--card-bg); overflow: hidden;">
+                        <div style="background: var(--paper); border-bottom: 1px solid var(--border); padding: 12px 18px; font-family: sans-serif; font-size: 0.8rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 0.05em; display: flex; justify-content: space-between; align-items: center;">
+                            <span><i class="fas fa-desktop"></i> Broadcast Render Preview</span>
+                            <span style="font-size: 0.75rem; opacity: 0.7; font-weight: normal; text-transform: none;">Simulated Client Viewport</span>
+                        </div>
+                        <div id="live-preview-body" style="padding: 20px; min-height: 150px; background: #ffffff; color: #1a1a1a; font-family: 'Georgia', serif; overflow-y: auto; line-height: 1.6; border-radius: 0 0 4px 4px;">
+                            <p style="color: #94a3b8; font-style: italic; font-family: sans-serif; font-size: 0.9rem;">No transmission payload defined. Input plain text or HTML syntax inside the editor space above.</p>
+                        </div>
+                    </div>
+                </div>
+                <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 12px 30px;">Transmit Broadcast Package</button>
+            </form>
+        </div>
+
+        <div id="tab-logs" class="management-panel">
+            <h3 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 10px; border-bottom: 2px solid var(--gold); padding-bottom: 10px;">
+                Operational Security Logs
+            </h3>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px;">Review chronological operational database entries, system state modifications, and user access records.</p>
+
+            <div style="background: var(--paper); border: 1px solid var(--border); border-radius: 4px; max-height: 500px; overflow-y: auto;">
+                {% if logs | length == 0 %}
+                <p style="padding: 20px; font-style: italic; opacity: 0.6; text-align: center;">No operational entries recorded in this session database window.</p>
+                {% else %}
+                    {% for log in logs %}
+                    <div class="log-row">
+                        <div style="flex-grow: 1;">
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <span class="log-tag {% if log.level == 'CRITICAL' %}log-critical{% elif log.level == 'WARNING' %}log-warning{% else %}log-info{% endif %}">{{ log.level }}</span>
+                                <span style="font-family: monospace; font-size: 0.75rem; font-weight: bold; background: var(--card-bg); padding: 1px 6px; border-radius: 2px; border: 1px solid var(--border);">{{ log.code }}</span>
+                                <span style="font-size: 0.8rem; opacity: 0.75;">By User ID: {{ log.user_id }}</span>
+                            </div>
+                            <div style="color: var(--ink); margin-top: 6px; line-height: 1.4;">{{ log.message }}</div>
+                        </div>
+                        <span style="opacity: 0.5; font-size: 0.8rem; white-space: nowrap;">{{ log.accessed_at }}</span>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="tab-maintenance" class="management-panel">
+            <h3 style="font-size: 1.4rem; color: var(--accent); margin-bottom: 10px; border-bottom: 2px solid var(--gold); padding-bottom: 10px;">
+                Platform Utilities & Maintenance Controls
+            </h3>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 25px;">Perform system-wide diagnostics, check repository folder allocations, or pause submission pipelines globally.</p>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="maintenance-card">
+                    <div>
+                        <strong style="color: var(--accent); font-size: 1.1rem; display: block; margin-bottom: 4px;">Global Submission Pipeline Lock</strong>
+                        <span style="font-size: 0.85rem; opacity: 0.75; display: block;">Instantly lock or release the manuscript submission engine for all scholars.</span>
+                    </div>
+                    <form action="/admin/maintenance/toggle-submissions" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-link" style="padding: 10px 20px; font-size: 0.8rem;">
+                            {% if config_submission_locked %}
+                            Unlock Submission Channel
+                            {% else %}
+                            Lock Submission Channel
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+
+                <div class="maintenance-card">
+                    <div>
+                        <strong style="color: var(--accent); font-size: 1.1rem; display: block; margin-bottom: 4px;">Clear Security Activity Log Book</strong>
+                        <span style="font-size: 0.85rem; opacity: 0.75; display: block;">Perform housekeeping by truncating old chronological security log items.</span>
+                    </div>
+                    <form action="/admin/maintenance/clear-logs" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-link" style="padding: 10px 20px; font-size: 0.8rem; border-color: #e74c3c; color: #e74c3c;">
+                            Truncate System Logs
+                        </button>
+                    </form>
+                </div>
+
+                <div class="maintenance-card">
+                    <div>
+                        <strong style="color: var(--accent); font-size: 1.1rem; display: block; margin-bottom: 4px;">Temporary Upload Directory Garbage Collector</strong>
+                        <span style="font-size: 0.85rem; opacity: 0.75; display: block;">Clean up untracked file pieces, duplicate manuscript drafts, or orphan logs.</span>
+                    </div>
+                    <form action="/admin/maintenance/gc-uploads" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-link" style="padding: 10px 20px; font-size: 0.8rem;">
+                            Run Garbage Collection
+                        </button>
+                    </form>
+                </div>
+
+                <div class="maintenance-card">
+                    <div>
+                        <strong style="color: var(--accent); font-size: 1.1rem; display: block; margin-bottom: 4px;">System Database Diagnostics</strong>
+                        <span style="font-size: 0.85rem; opacity: 0.75; display: block;">Run index optimizations and diagnostic checks across tables.</span>
+                    </div>
+                    <form action="/admin/maintenance/optimize-db" method="POST" style="margin: 0;">
+                        <button type="submit" class="btn-link" style="padding: 10px 20px; font-size: 0.8rem;">
+                            Optimize Database Indexes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Modal for Targeted Personal Notifications -->
+<div class="modal" id="direct-notify-modal" style="z-index: 6000;">
+    <div class="modal-content" style="max-width: 500px;">
+        <button class="modal-close" onclick="closeDirectNotifyModal()">&times;</button>
+        <h2 class="modal-title" style="font-size: 1.5rem;">Dispatch Personal Alert</h2>
+        
+        <p style="font-size: 0.85rem; opacity: 0.75; margin-bottom: 20px; text-align: center;">
+            Sending direct database notification to scholar: <strong id="notify-recipient-name" style="color: var(--gold);"></strong>
+        </p>
+
+        <form id="direct-notify-form" onsubmit="submitDirectNotification(event)">
+            <input type="hidden" id="notify-recipient-id" name="recipient_id">
+            
+            <div class="form-group">
+                <label for="notify-title">Alert Title</label>
+                <input type="text" id="notify-title" required placeholder="e.g., Manuscript Revisions Required">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div>
+                    <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; opacity: 0.8;">Display Category</label>
+                    <select id="notify-category" class="action-select" style="width:100%; height:45px; padding:10px; background:var(--paper); color:var(--ink);">
+                        <option value="system">System Alerts</option>
+                        <option value="manuscripts">Manuscripts pipeline</option>
+                        <option value="alerts">Editorial Urgent alerts</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; opacity: 0.8;">Icon Graphic</label>
+                    <select id="notify-icon" class="action-select" style="width:100%; height:45px; padding:10px; background:var(--paper); color:var(--ink);">
+                        <option value="fa-bell">Bell Notification</option>
+                        <option value="fa-exclamation-triangle">Warning Triangle</option>
+                        <option value="fa-file-signature">Document Signature</option>
+                        <option value="fa-user-clock">User Waiting Clock</option>
+                        <option value="fa-envelope">Postal Envelope</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notify-message">Alert Description / Message</label>
+                <textarea id="notify-message" required placeholder="Outline explicit instructions or notification content here..." style="width: 100%; min-height: 120px; background: var(--paper); color: var(--ink); border: 1px solid var(--border); border-radius: 4px; padding: 12px; font-family: 'Georgia', serif; font-size: 0.95rem; line-height: 1.5; outline: none;"></textarea>
+            </div>
+
+            <button type="submit" id="direct-notify-submit-btn" class="btn-submit" style="margin-top: 10px;">Transmit Secure Alert</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function switchManagementTab(evt, panelId) {
+        const btns = document.getElementsByClassName('side-tab-btn');
+        for (let i = 0; i < btns.length; i++) {
+            btns[i].classList.remove('active');
+        }
+        const panels = document.getElementsByClassName('management-panel');
+        for (let i = 0; i < panels.length; i++) {
+            panels[i].classList.remove('active');
+        }
+        evt.currentTarget.classList.add('active');
+        document.getElementById(panelId).classList.add('active');
+    }
+
+    function toggleMarketingFields() {
+        const channel = document.getElementById('marketing-channel-select').value;
+        const subpanel = document.getElementById('notif-details-subpanel');
+        const headingLabel = document.getElementById('subject-heading-label');
+        
+        if (channel === 'notification' || channel === 'omni') {
+            subpanel.style.display = 'block';
+            headingLabel.textContent = "Notification Header / Subject Line";
+        } else {
+            subpanel.style.display = 'none';
+            headingLabel.textContent = "Subject Heading (Email Only)";
+        }
+    }
+
+    function openDirectNotifyModal(userId, userName) {
+        document.getElementById('notify-recipient-id').value = userId;
+        document.getElementById('notify-recipient-name').textContent = userName;
+        
+        // Reset fields
+        document.getElementById('notify-title').value = '';
+        document.getElementById('notify-message').value = '';
+        document.getElementById('notify-category').value = 'system';
+        document.getElementById('notify-icon').value = 'fa-bell';
+        
+        document.getElementById('direct-notify-modal').classList.add('active');
+    }
+
+    function closeDirectNotifyModal() {
+        document.getElementById('direct-notify-modal').classList.remove('active');
+    }
+
+    function submitDirectNotification(event) {
+        event.preventDefault();
+        const btn = document.getElementById('direct-notify-submit-btn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Dispatching...';
+        btn.disabled = true;
+
+        const userId = document.getElementById('notify-recipient-id').value;
+        const title = document.getElementById('notify-title').value;
+        const message = document.getElementById('notify-message').value;
+        const category = document.getElementById('notify-category').value;
+        const icon = document.getElementById('notify-icon').value;
+
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('message', message);
+        formData.append('category', category);
+        formData.append('icon', icon);
+
+        fetch(`/admin/user/notify/${userId}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            btn.innerHTML = 'Transmit Secure Alert';
+            btn.disabled = false;
+            if (data.status === 'ok') {
+                closeDirectNotifyModal();
+                if (typeof showToast === 'function') {
+                    showToast("Alert dispatched to scholar workspace successfully.");
+                } else {
+                    alert("Alert dispatched successfully.");
+                }
+            } else {
+                alert(data.message || "Failed to submit alert.");
+            }
+        })
+        .catch(err => {
+            btn.innerHTML = 'Transmit Secure Alert';
+            btn.disabled = false;
+            console.error(err);
+            alert("Database interface offline or route failed.");
+        });
+    }
+
+    function syncBroadcastContent() {
+        const editor = document.getElementById('broadcast-editor');
+        const textarea = document.getElementById('broadcast-message');
+        const previewBody = document.getElementById('live-preview-body');
+        
+        if (editor && textarea) {
+            textarea.value = editor.innerHTML;
+        }
+        
+        if (textarea && previewBody) {
+            previewBody.innerHTML = textarea.value || '<p style="color: #94a3b8; font-style: italic; font-family: sans-serif; font-size: 0.9rem;">No transmission payload defined. Input plain text or HTML syntax inside the editor space above.</p>';
+        }
+    }
+
+    function execBroadcastCmd(command, value = null) {
+        document.execCommand(command, false, value);
+        syncBroadcastContent();
+    }
+
+    function addBroadcastLink() {
+        const url = prompt("Enter link destination URL:");
+        if (url) {
+            execBroadcastCmd("createLink", url);
+        }
+    }
+
+    function toggleLivePreview() {
+        const previewContainer = document.getElementById('live-preview-container');
+        const toggleBtn = document.getElementById('preview-toggle-btn');
+        if (previewContainer.style.display === 'none') {
+            previewContainer.style.display = 'block';
+            toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Live Preview';
+            toggleBtn.style.borderColor = 'var(--gold)';
+            toggleBtn.style.color = 'var(--gold)';
+            syncBroadcastContent();
+        } else {
+            previewContainer.style.display = 'none';
+            toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Show Live Preview';
+            toggleBtn.style.borderColor = 'var(--border)';
+            toggleBtn.style.color = 'var(--ink)';
+        }
+    }
+
+    function previewInNewWindow() {
+        const textarea = document.getElementById('broadcast-message');
+        const content = textarea ? textarea.value : '';
+        if (!content.trim()) {
+            if (typeof showToast === 'function') {
+                showToast("Please enter some HTML or text content to preview.");
+            } else {
+                console.warn("Please enter some HTML or text content to preview.");
+            }
+            return;
+        }
+        const previewWin = window.open("", "_blank");
+        if (previewWin) {
+            previewWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Broadcast HTML Preview</title>
+                    <style>
+                        body {
+                            font-family: 'Georgia', serif;
+                            line-height: 1.6;
+                            padding: 40px;
+                            max-width: 800px;
+                            margin: 0 auto;
+                            color: #1a1a1a;
+                            background-color: #f9f7f2;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${content}
+                </body>
+                </html>
+            `);
+            previewWin.document.close();
+        } else {
+            if (typeof showToast === 'function') {
+                showToast("Pop-up blocked! Please allow pop-ups for this site.");
+            } else {
+                console.error("Pop-up blocked! Please allow pop-ups for this site.");
+            }
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const tableBody = document.getElementById('scholars-table-body');
+        if (tableBody) {
+            tableRows = Array.from(tableBody.querySelectorAll('.scholar-row'));
+            updatePagination();
+        }
+        toggleMarketingFields();
+    });
+
+    function updatePageSize(size) {
+        if (size === 'all') {
+            rowsPerPage = tableRows.length;
+        } else {
+            rowsPerPage = parseInt(size, 10);
+        }
+        currentPage = 1;
+        updatePagination();
+    }
+
+    function changePage(direction) {
+        const totalPages = Math.ceil(tableRows.length / rowsPerPage);
+        const targetPage = currentPage + direction;
+        
+        if (targetPage >= 1 && targetPage <= totalPages) {
+            currentPage = targetPage;
+            updatePagination();
+        }
+    }
+
+    function updatePagination() {
+        if (tableRows.length === 0) {
+            document.getElementById('table-metrics').textContent = "No registered users discovered.";
+            document.getElementById('page-indicator').textContent = "Page 0 of 0";
+            return;
+        }
+
+        const totalPages = Math.ceil(tableRows.length / rowsPerPage) || 1;
+        
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        const endIndex = Math.min(startIndex + rowsPerPage, tableRows.length);
+
+        tableRows.forEach((row, index) => {
+            if (index >= startIndex && index < endIndex) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        document.getElementById('table-metrics').textContent = `Showing ${startIndex + 1} to ${endIndex} of ${tableRows.length} registered users`;
+        document.getElementById('page-indicator').textContent = `Page ${currentPage} of ${totalPages}`;
+
+        document.getElementById('btn-prev-page').disabled = (currentPage === 1);
+        document.getElementById('btn-prev-page').style.opacity = (currentPage === 1) ? "0.3" : "1";
+        document.getElementById('btn-prev-page').style.pointerEvents = (currentPage === 1) ? "none" : "auto";
+
+        document.getElementById('btn-next-page').disabled = (currentPage === totalPages);
+        document.getElementById('btn-next-page').style.opacity = (currentPage === totalPages) ? "0.3" : "1";
+        document.getElementById('btn-next-page').style.pointerEvents = (currentPage === totalPages) ? "none" : "auto";
+    }
+</script>
+{% endif %}
+{% endblock %}

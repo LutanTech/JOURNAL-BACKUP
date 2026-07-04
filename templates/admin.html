@@ -78,7 +78,7 @@
 </div>
 
 <div style="display: flex; gap: 10px; margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 20px; flex-wrap: wrap;">
-    <a class="admin-nav-link active" href="{{ url_for('admin_portal') }}">
+    <a class="admin-nav-link" href="{{ url_for('admin_portal') }}">
         <i class="fas fa-list-check"></i> Inventory Overview
     </a>
     <a class="admin-nav-link" href="{{ url_for('admin_structure') }}">
@@ -86,6 +86,12 @@
     </a>
     <a class="admin-nav-link" href="{{ url_for('admin_publish') }}">
         <i class="fas fa-file-signature"></i> Publish Article
+    </a>
+    <a class="admin-nav-link" href="/admin/submissions">
+        <i class="fas fa-envelope-open-text"></i> Scholar Submissions
+    </a>
+    <a class="admin-nav-link active" href="/admin/management">
+        <i class="fas fa-gears"></i> Management
     </a>
 </div>
 
@@ -169,11 +175,28 @@
             <p style="font-size: 0.9rem; opacity: 0.75;">Administrative authorization is mandatory to execute repository modifications.</p>
         </div>
 
-        {% if error %}
-        <div style="background: #fdf2f2; border: 1px solid #f5baba; color: #de3b3b; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 0.85rem; font-family: sans-serif; text-align: center;">
-            <i class="fas fa-exclamation-triangle" style="margin-right: 6px;"></i> {{ error }}
-        </div>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+        {% for category, message in messages %}
+            <div style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px;">
+                    <div class=" notif 
+                    {% if category == 'error' %} -error-msg {% endif %}
+                    {% if category == 'success' %} -success-msg {% endif %}
+                    {% if category == 'warning' %} -warning-msg {% endif %}
+                    {% if category == 'info' %} -info-msg {% endif %}
+                    " >
+                        <i class="fas 
+                        {% if category == 'error' %} fa-close-circle {% endif %}
+                    {% if category == 'success' %} fa-check-circle {% endif %}
+                    {% if category == 'warning' %} fa-warning {% endif %}
+                    {% if category == 'info' %} fa-info-circle {% endif %}
+                        "></i>
+                        <span>{{ message }}</span>
+                    </div>
+            </div>
+        {% endfor %}
         {% endif %}
+        {% endwith %}
 
         <form action="{{ url_for('admin_login') }}" method="post" style="display: flex; flex-direction: column; gap: 20px;">
             <div>

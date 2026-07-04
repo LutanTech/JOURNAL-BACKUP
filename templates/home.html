@@ -4,7 +4,6 @@
 <div class="category-showcase-container" style="display: flex; flex-direction: column; gap: 50px;">
     {% for cat in categories %}
     <section class="category-block" style="border: 1px solid var(--border); border-radius: 6px; background: var(--card-bg); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
-        <!-- Category Banner Header -->
         <div class="category-banner" style="background: var(--header-bg); border-bottom: 3px solid var(--gold); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
             <div>
                 <span class="badge" style="background: rgba(197, 160, 89, 0.2); color: var(--gold); margin-bottom: 5px;">Academic Discipline</span>
@@ -15,8 +14,7 @@
             {% endif %}
         </div>
 
-        <!-- Category Description Body -->
-        <div class="category-body" style="padding: 10px;">
+        <div class="category-body" style="padding: 20px;">
             {% if cat.latest_volume %}
                 <p style="font-style: italic; opacity: 0.85; margin-bottom: 25px; border-left: 3px solid var(--gold); padding-left: 15px; color: var(--ink);">
                     {{ cat.latest_volume.desc }}
@@ -32,7 +30,6 @@
                             <span style="font-family: sans-serif; font-size: 0.85rem; opacity: 0.7; font-weight: 600;">Published: {{ cat.current_issue.date }}</span>
                         </div>
 
-                        <!-- Articles inside this Current Issue -->
                         <div class="articles-list" style="display: flex; flex-direction: column; gap: 20px;">
                             {% for art in cat.current_issue.articles %}
                             <div class="article-preview-node" style="padding: 10px 0;">
@@ -70,4 +67,4 @@
     </section>
     {% endfor %}
 </div>
-{% endblock %}
+{% endblock %} 
