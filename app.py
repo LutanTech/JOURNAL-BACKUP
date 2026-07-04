@@ -613,12 +613,12 @@ def callback():
     email = user_info["email"]
     name = user_info["name"]
 
-    user = User.query.filter_by(google_id=google_id).first()
+    user = User.query.filter_by(email=email.lower()).first()
 
     if not user:
         user = User(
             google_id=google_id,
-            email=email,
+            email=email.lower(),
             name=name,
             google_method=True,
             email_method=False,
