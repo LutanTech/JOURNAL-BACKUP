@@ -1,5 +1,12 @@
 Flask
-Flask-Limiter
+Flask-Cors
+Flask-Mail
+Flask-Migrate
 Flask-SQLAlchemy
+Flask-Limiter
+python-dotenv
+requests
 SQLAlchemy
 Werkzeug
+google-auth
+google-auth-oauthlib
