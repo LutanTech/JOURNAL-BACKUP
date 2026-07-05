@@ -1744,10 +1744,18 @@ def get_user_notifications():
     """
     user_id = session.get('user_id')
     if not user_id:
-        return jsonify({'status': 'error', 'message': 'Authentication required.'}), 401
-
-    # Fetch alerts mapped explicitly to user profile, chronologically ordered
-    notifications = Notification.query.filter_by(target_id=user_id).order_by(Notification.created_at.desc()).all()
+        notifications = Notification.query.filter(
+        (Notification.category == "system") | (Notification.category == "admin") | (Notification.category == "alerts") | (Notification.category == "manuscripts") |
+        (not Notification.is_read)).order_by(Notification.created_at.desc()).all()
+    
+    else:
+        notifications = Notification.query.filter(
+        (Notification.category == "system") | (Notification.category == "admin") | (Notification.category == "alerts") | (Notification.category == "manuscripts") |
+        (
+            (Notification.target_id == user_id) &
+            (not Notification.is_read)
+        )
+        ).order_by(Notification.created_at.desc()).all()
     
     # Process output list
     serialized = []
@@ -1759,7 +1767,7 @@ def get_user_notifications():
             'desc': n.desc,
             'icon': n.icon,
             'created_at': n.created_at.strftime("%Y-%m-%d %H:%M:%S") if isinstance(n.created_at, datetime) else str(n.created_at),
-            'is_read': n.is_read
+            'is_read': n.is_read if n.is_read else False
         })
 
     return jsonify({'status': 'ok', 'notifications': serialized})
