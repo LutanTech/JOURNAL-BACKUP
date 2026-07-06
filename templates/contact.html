@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact the Editorial Office - Tunu Journal Archive{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>Contact Us</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Communication Gateway</span>
+    <h2>Contact Our Offices</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Reach out to our Editorial Board, technical support desks, or administrative registry. We look forward to your inquiry.</p>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px;">
+            {% for message in messages %}
+                <div style="background: rgba(46, 204, 113, 0.1); border-left: 4px solid #2ecc71; color: var(--ink); padding: 15px 20px; border-radius: 0 4px 4px 0; font-size: 0.95rem; font-family: sans-serif; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-circle-check" style="color: #2ecc71;"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="article-view-layout">
+    <!-- Left column: Contact Form -->
+    <div class="article-full-content" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 40px;">
+        <h3 style="font-family: 'Georgia', serif; font-size: 1.5rem; color: var(--accent); margin-bottom: 10px; border-bottom: 2px solid var(--gold); padding-bottom: 10px;">
+            <i class="fas fa-paper-plane" style="color: var(--gold); margin-right: 8px;"></i> Send a Message
+        </h3>
+        <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 25px;">Please fill out the form below. Messages are triaged and routed directly to the appropriate section editor or systems engineer.</p>
+
+        <form action="{{ url_for('contact') }}" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                <div class="form-grid-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Full Name</label>
+                        <input type="text" name="name" required placeholder="e.g., Prof. Jane Doe" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none; font-family: inherit;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Email Address</label>
+                        <input type="email" name="email" required placeholder="e.g., scholar@university.ac.ke" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none; font-family: inherit;">
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Department & Purpose</label>
+                <select name="department" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none; font-family: sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                    <option value="Editorial Board">Editorial Board (Manuscript status, scope inquiries)</option>
+                    <option value="Technical Support">Technical Support (OTP issues, authentication, errors)</option>
+                    <option value="Institutional Licensing">Institutional Partnerships (Libraries, university licenses)</option>
+                    <option value="General Inquiries">General / Other Inquiries</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Subject Heading</label>
+                <input type="text" name="subject" required placeholder="e.g., Inquiry regarding metadata index coverage" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); outline: none; font-family: inherit;">
+            </div>
+
+            <div>
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Message Body</label>
+                <textarea name="message" required placeholder="Please write details of your request here..." style="width: 100%; min-height: 180px; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); font-family: inherit; line-height: 1.6; outline: none; resize: vertical;"></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 12px 30px; width: auto; font-family: sans-serif; font-weight: 600; text-transform: uppercase; cursor: pointer;">Transmit Message Packet</button>
+        </form>
+    </div>
+
+    <!-- Right column: Contacts, Office & Info -->
+    <div class="article-sidebar" style="display: flex; flex-direction: column; gap: 30px;">
+        <div class="sidebar-widget" style="background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 6px;">
+            <h4 style="font-family: sans-serif; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 15px; color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 8px;">
+                Editorial Office
+            </h4>
+            <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px;">
+                <strong>The Tunu Journal</strong> &bull; Tunu Publishers<br>
+                Harambee SACCO Shopping Centre<br>
+                Donholm, Outering Road<br>
+                P.O. Box 7188-00100<br>
+                Nairobi, Kenya
+            </p>
+            <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 0;">
+                <i class="fas fa-envelope" style="color: var(--gold); margin-right: 8px; width: 14px;"></i> <a href="mailto:archives@tunujournal.com" style="color: inherit; text-decoration: none;">archives@tunujournal.com</a><br>
+                <i class="fas fa-envelope-open-text" style="color: var(--gold); margin-right: 8px; width: 14px;"></i> <a href="mailto:support@tunujournal.com" style="color: inherit; text-decoration: none;">support@tunujournal.com</a><br>
+                <i class="fas fa-phone-alt" style="color: var(--gold); margin-right: 8px; width: 14px;"></i> +254 722 682 129<br>
+                <i class="fas fa-phone-alt" style="color: var(--gold); margin-right: 8px; width: 14px;"></i> +254 795 689 523
+            </p>
+        </div>
+
+        <div class="sidebar-widget" style="background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 6px;">
+            <h4 style="font-family: sans-serif; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 15px; color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 8px;">
+                Response Timelines
+            </h4>
+            <p style="font-size: 0.85rem; line-height: 1.5; opacity: 0.8; margin-bottom: 12px;">
+                <strong>General/Technical Support:</strong> Typically answered within 24 hours.
+            </p>
+            <p style="font-size: 0.85rem; line-height: 1.5; opacity: 0.8; margin-bottom: 0;">
+                <strong>Editorial board matters:</strong> Scope validation, manuscript feedback, and formal peer review issues generally require up to 48 hours for triage and processing.
+            </p>
+        </div>
+
+        <div class="sidebar-widget" style="background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 6px;">
+            <h4 style="font-family: sans-serif; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; margin-bottom: 15px; color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 8px;">
+                Location Coordinates
+            </h4>
+            <!-- Mock visual map representation matching academic theme -->
+            <div style="background: var(--paper); border: 1px solid var(--border); border-radius: 4px; height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; color: var(--ink);">
+                <i class="fas fa-map-location-dot" style="font-size: 2rem; color: var(--gold);"></i>
+                <span style="font-family: sans-serif; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">Outering Rd, Nairobi</span>
+                <span style="font-size: 0.7rem; opacity: 0.7;">1&deg; 18' 14.8" S | 36&deg; 53' 40.2" E</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

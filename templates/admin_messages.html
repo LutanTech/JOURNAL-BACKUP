@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Support & Editorial Messages - Tunu Journal Archive{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a href="{{ url_for('admin_portal') }}">System Administration</a>
+<span>/</span>
+<a>Support Messages</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+{% if session.get('admin_logged_in') %}
+
+<style>
+    .admin-nav-link {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--ink);
+        font-family: sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 12px 20px;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .admin-nav-link:hover {
+        background: rgba(0, 0, 0, 0.03);
+    }
+    body.dark-theme .admin-nav-link:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    .admin-nav-link.active {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: #ffffff;
+    }
+    
+    .messages-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    @media (min-width: 992px) {
+        .messages-layout {
+            grid-template-columns: 350px 1fr;
+        }
+    }
+
+    .message-list-pane {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-height: 700px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .message-item-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .message-item-card:hover {
+        border-color: var(--gold);
+    }
+    .message-item-card.active {
+        border-color: var(--gold);
+        background: var(--paper);
+    }
+
+    .message-badge {
+        font-family: sans-serif;
+        font-size: 0.7rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+    .badge-pending { background: rgba(243, 156, 18, 0.15); color: #d35400; }
+    .badge-replied { background: rgba(52, 152, 219, 0.15); color: #2980b9; }
+    .badge-resolved { background: rgba(46, 204, 113, 0.15); color: #27ae60; }
+
+    .detail-view-pane {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 30px;
+        display: none;
+    }
+    .detail-view-pane.active {
+        display: block;
+    }
+
+    .reply-box {
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 20px;
+        margin-top: 25px;
+    }
+</style>
+
+<div class="archive-details-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <div>
+        <span class="archive-details-subtitle">System Console</span>
+        <h2>Support & Communications Center</h2>
+    </div>
+    <a href="{{ url_for('admin_logout') }}" class="btn-link" style="border-color: #e74c3c; color: #e74c3c;"><i class="fas fa-sign-out-alt"></i> De-authenticate Session</a>
+</div>
+
+<div style="display: flex; gap: 10px; margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 20px; flex-wrap: wrap;">
+    <a class="admin-nav-link" href="{{ url_for('admin_portal') }}">
+        <i class="fas fa-list-check"></i> Inventory Overview
+    </a>
+    <a class="admin-nav-link" href="{{ url_for('admin_structure') }}">
+        <i class="fas fa-folder-plus"></i> Volumes & Issues
+    </a>
+    <a class="admin-nav-link" href="{{ url_for('admin_publish') }}">
+        <i class="fas fa-file-signature"></i> Publish Article
+    </a>
+    <a class="admin-nav-link" href="/admin/submissions">
+        <i class="fas fa-envelope-open-text"></i> Scholar Submissions
+    </a>
+    <a class="admin-nav-link active" href="/admin/messages">
+        <i class="fas fa-comments"></i> Support Messages
+    </a>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px;">
+            {% for message in messages %}
+                <div style="background: rgba(197, 160, 89, 0.1); border-left: 4px solid var(--gold); color: var(--ink); padding: 15px 20px; border-radius: 0 4px 4px 0; font-size: 0.9rem; font-family: sans-serif; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-info-circle" style="color: var(--gold);"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="messages-layout">
+    <aside class="message-list-pane">
+        <h3 style="font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gold); margin-bottom: 5px;">Inbox Messages</h3>
+        
+        {% if messages | length == 0 %}
+            <div style="text-align: center; padding: 40px 10px; border: 1px dashed var(--border); border-radius: 4px;">
+                <p style="opacity: 0.6; font-style: italic;">No inquiries stored in the database.</p>
+            </div>
+        {% endif %}
+
+        {% for msg in messages %}
+            <div class="message-item-card" id="card-{{ msg.id }}" onclick="selectMessage({{ msg.id }})">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span class="message-badge {% if msg.status == 'Pending' %}badge-pending{% elif msg.status == 'Replied' %}badge-replied{% else %}badge-resolved{% endif %}" id="badge-{{ msg.id }}">{{ msg.status }}</span>
+                    <small style="opacity: 0.6; font-size: 0.75rem;">{{ msg.created_at.strftime('%b %d, %H:%M') }}</small>
+                </div>
+                <h4 style="font-size: 0.95rem; margin-bottom: 4px; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ msg.subject }}</h4>
+                <p style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 2px;">{{ msg.name }}</p>
+                <small style="opacity: 0.6; font-family: sans-serif;">{{ msg.department }}</small>
+            </div>
+        {% endfor %}
+    </aside>
+
+    <section class="detail-workspace">
+        <div id="no-selection" style="background: var(--card-bg); border: 1px solid var(--border); border-radius: 6px; padding: 60px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px;">
+            <i class="fas fa-envelope-open" style="font-size: 3rem; color: var(--gold); opacity: 0.5; margin-bottom: 15px;"></i>
+            <h4 style="font-size: 1.2rem; color: var(--accent);">No Message Selected</h4>
+            <p style="opacity: 0.7; font-size: 0.9rem; max-width: 320px; margin-top: 5px;">Select an incoming communication ticket from the sidebar to review logs, change status, or dispatch emails.</p>
+        </div>
+
+        {% for msg in messages %}
+            <div class="detail-view-pane" id="detail-{{ msg.id }}">
+                <div style="display: flex; justify-content: space-between; align-items: start; border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <span style="font-family: sans-serif; font-size: 0.8rem; font-weight: bold; color: var(--gold); text-transform: uppercase;">{{ msg.department }}</span>
+                        <h3 style="font-family: 'Georgia', serif; font-size: 1.5rem; color: var(--accent); margin-top: 4px;">{{ msg.subject }}</h3>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <form action="/admin/messages/resolve/{{ msg.id }}" method="POST" style="margin: 0;">
+                            <button type="submit" class="btn-link" style="font-size: 0.8rem; padding: 6px 12px; border-color: #27ae60; color: #27ae60;">
+                                Mark Resolved
+                            </button>
+                        </form>
+                        <form action="/admin/messages/delete/{{ msg.id }}" method="POST" style="margin: 0;" onsubmit="return confirm('Delete this message records permanently?');">
+                            <button type="submit" class="btn-link" style="font-size: 0.8rem; padding: 6px 12px; border-color: #e74c3c; color: #e74c3c;">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; background: var(--paper); padding: 15px; border-radius: 4px; border: 1px solid var(--border);">
+                    <div>
+                        <span style="display: block; font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; opacity: 0.6; font-weight: bold;">Sender Name</span>
+                        <strong style="color: var(--accent);">{{ msg.name }}</strong>
+                    </div>
+                    <div>
+                        <span style="display: block; font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; opacity: 0.6; font-weight: bold;">Email Address</span>
+                        <a href="mailto:{{ msg.email }}" style="color: inherit; text-decoration: none;"><strong>{{ msg.email }}</strong></a>
+                    </div>
+                    <div>
+                        <span style="display: block; font-family: sans-serif; font-size: 0.7rem; text-transform: uppercase; opacity: 0.6; font-weight: bold;">Date Transmitted</span>
+                        <strong>{{ msg.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</strong>
+                    </div>
+                </div>
+
+                <div style="line-height: 1.8; color: var(--ink); background: var(--paper); border: 1px solid var(--border); border-radius: 4px; padding: 25px; margin-bottom: 25px; font-family: 'Georgia', serif; font-size: 1.05rem; white-space: pre-wrap;">{{ msg.message }}</div>
+
+                {% if msg.reply %}
+                    <div style="border-left: 4px solid var(--gold); padding-left: 20px; margin-bottom: 25px;">
+                        <span style="display: block; font-family: sans-serif; font-size: 0.75rem; text-transform: uppercase; color: var(--gold); font-weight: bold; margin-bottom: 8px;">Your Admin Reply</span>
+                        <div style="font-family: 'Georgia', serif; line-height: 1.8; color: var(--ink); opacity: 0.9; font-size: 1rem; white-space: pre-wrap;">{{ msg.reply }}</div>
+                    </div>
+                {% endif %}
+
+                <div class="reply-box">
+                    <h4 style="font-family: sans-serif; font-size: 0.85rem; text-transform: uppercase; color: var(--gold); margin-bottom: 15px; letter-spacing: 0.05em;">Dispatch Reply Message</h4>
+                    <form action="/admin/messages/reply/{{ msg.id }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+                        <div>
+                            <textarea name="reply" required placeholder="Compose your formal response message here..." style="width: 100%; min-height: 150px; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--card-bg); color: var(--ink); font-family: inherit; line-height: 1.6; outline: none; resize: vertical;"></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 10px 25px; font-size: 0.8rem; font-family: sans-serif; font-weight: 600; text-transform: uppercase;">Transmit Reply Email</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+</div>
+
+<script>
+    function selectMessage(msgId) {
+        document.getElementById('no-selection').style.display = 'none';
+
+        const detailPanes = document.querySelectorAll('.detail-view-pane');
+        detailPanes.forEach(pane => pane.classList.remove('active'));
+
+        const cards = document.querySelectorAll('.message-item-card');
+        cards.forEach(card => card.classList.remove('active'));
+
+        const targetPane = document.getElementById('detail-' + msgId);
+        if (targetPane) {
+            targetPane.classList.add('active');
+        }
+
+        const targetCard = document.getElementById('card-' + msgId);
+        if (targetCard) {
+            targetCard.classList.add('active');
+        }
+    }
+</script>
+
+{% endif %}
+{% endblock %}
