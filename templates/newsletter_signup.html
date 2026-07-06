@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Newsletter Sign-up - Tunu Journal Archive{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{{ url_for('home') }}">Home</a>
+<span>/</span>
+<a>Newsletter Sign-up</a>
+{% endblock %}
+
+{% block intro %}{% endblock %}
+{% block search_bar %}{% endblock %}
+
+{% block content %}
+<style>
+    .signup-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    @media (min-width: 992px) {
+        .signup-container {
+            grid-template-columns: 1.5fr 1fr;
+        }
+    }
+    .signup-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 40px;
+    }
+    .recaptcha-widget {
+        background: var(--paper);
+        border: 1px solid var(--border);
+        border-radius: 3px;
+        padding: 12px 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 304px;
+        margin-bottom: 25px;
+        font-family: sans-serif;
+    }
+    .recaptcha-checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+    }
+    .recaptcha-box {
+        width: 24px;
+        height: 24px;
+        border: 2px solid var(--border);
+        border-radius: 2px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    .recaptcha-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--ink);
+    }
+    .recaptcha-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.6rem;
+        opacity: 0.7;
+    }
+    .recaptcha-brand i {
+        font-size: 1.25rem;
+        color: #4285f4;
+        margin-bottom: 2px;
+    }
+    .recaptcha-box i {
+        color: #009688;
+        font-size: 0.9rem;
+        display: none;
+    }
+    .recaptcha-box.checked {
+        border-color: #009688;
+        background: #ffffff;
+    }
+    .recaptcha-box.checked i {
+        display: block;
+    }
+    .recaptcha-box.loading {
+        border-color: #4285f4;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: recaptcha-spin 0.8s linear infinite;
+    }
+    @keyframes recaptcha-spin {
+        to { transform: rotate(360deg); }
+    }
+    .optin-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 25px;
+        cursor: pointer;
+    }
+    .optin-checkbox {
+        margin-top: 4px;
+        accent-color: var(--gold);
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+    .optin-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        opacity: 0.9;
+    }
+</style>
+
+<div class="archive-details-header">
+    <span class="archive-details-subtitle">Intellectual Dissemination</span>
+    <h2>Newsletter Sign-up</h2>
+    <p style="opacity: 0.8; margin-top: 10px;">Subscribe to receive timely scholarly notifications, call-for-papers announcements, and newly archived volume catalogs directly to your inbox.</p>
+</div>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div style="margin-bottom: 25px; display: flex; flex-direction: column; gap: 10px;">
+            {% for message in messages %}
+                <div style="background: rgba(197, 160, 89, 0.1); border-left: 4px solid var(--gold); color: var(--ink); padding: 15px 20px; border-radius: 0 4px 4px 0; font-size: 0.9rem; font-family: sans-serif; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-info-circle" style="color: var(--gold);"></i>
+                    <span>{{ message }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<div class="signup-container">
+    <div class="signup-card">
+        <form action="{{ url_for('newsletter') }}" method="POST" id="newsletter-form" onsubmit="return validateForm(event)">
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; opacity: 0.8;">Full Name</label>
+                <input type="text" name="name" required placeholder="e.g. Dr. Clara Oswald" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); font-family: inherit;">
+            </div>
+            
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; opacity: 0.8;">Email Address</label>
+                <input type="email" name="email" required placeholder="e.g. oswald@university.edu" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink); font-family: inherit;">
+            </div>
+
+            <label class="optin-container">
+                <input type="checkbox" name="marketing_optin" class="optin-checkbox" required checked>
+                <span class="optin-text">
+                    I agree to receive email marketing, promotional messages, and system-wide call-for-papers dispatches from Tunu Publishers.
+                </span>
+            </label>
+
+            <div class="recaptcha-widget">
+                <div class="recaptcha-checkbox-container" onclick="triggerRecaptcha()">
+                    <div class="recaptcha-box" id="recaptcha-box">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <span class="recaptcha-label">I'm not a robot</span>
+                </div>
+                <div class="recaptcha-brand">
+                    <i class="fab fa-google"></i>
+                    <span>reCAPTCHA</span>
+                    <span style="font-size: 0.5rem; opacity: 0.6;">Privacy - Terms</span>
+                </div>
+            </div>
+
+            <input type="hidden" id="recaptcha-verified" name="recaptcha_verified" value="false">
+
+            <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 12px 30px;">Subscribe to Communications</button>
+        </form>
+    </div>
+
+    <div class="article-sidebar">
+        <div class="sidebar-widget">
+            <h4>Subscription Benefits</h4>
+            <p style="margin-bottom: 12px; font-size: 0.9rem; line-height: 1.5;"><strong>✓ Immediate Catalog Alerts:</strong> Get notified instantly when semi-annual volumes and monthly special issues are published.</p>
+            <p style="margin-bottom: 12px; font-size: 0.9rem; line-height: 1.5;"><strong>✓ Exclusive Calls for Papers:</strong> Receive priority notices regarding upcoming thematic structures, symposia, and academic deadlines.</p>
+            <p style="margin-bottom: 0; font-size: 0.9rem; line-height: 1.5;"><strong>✓ Preservation Policy Updates:</strong> Stay informed on institutional open-access models and library repository expansion updates.</p>
+        </div>
+        
+        <div class="sidebar-widget">
+            <h4>Privacy Assurance</h4>
+            <p style="font-size: 0.85rem; line-height: 1.5; opacity: 0.8;">Your registration data is strictly managed in accordance with our data guidelines. We never distribute our lists to third-party marketing services or commercial data harvesters.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isVerifying = false;
+    let isVerified = false;
+
+    function triggerRecaptcha() {
+        if (isVerified || isVerifying) return;
+        
+        const box = document.getElementById('recaptcha-box');
+        box.classList.add('loading');
+        isVerifying = true;
+
+        setTimeout(() => {
+            box.classList.remove('loading');
+            box.classList.add('checked');
+            isVerifying = false;
+            isVerified = true;
+            document.getElementById('recaptcha-verified').value = "true";
+        }, 1200);
+    }
+
+    function validateForm(event) {
+        if (!isVerified) {
+            event.preventDefault();
+            showToast("Please verify that you are not a robot first.");
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

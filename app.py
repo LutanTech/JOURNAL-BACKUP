@@ -312,7 +312,6 @@ class Notification(db.Model):
                 'is_read':self.is_read,
             }
         
-
 class ContactMessage(db.Model):
     __tablename__ = "contact_messages"
 
@@ -327,27 +326,14 @@ class ContactMessage(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False)
     is_read = db.Column(db.Boolean, default=False, nullable=False)
 
-class SupportMessage(db.Model):
-    __tablename__ = "support_messages"
-
+class Subscription(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
-    email = db.Column(db.String(255), nullable=False, index=True)
-    message = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow() + timedelta(hours=DELTA), nullable=False)
-    is_read = db.Column(db.Boolean, default=False, nullable=False)
-    user_id = db.Column(db.String, db.ForeignKey("users.id"), nullable=True)
-    user = db.relationship("User", backref="support_messages")
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'email': self.email,
-            'message': self.message,
-            'created_at': self.created_at,
-            'is_read': self.is_read
-        }
-
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(180), unique=True, nullable=False)
+    marketing_optin = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), nullable=False)
+    
+    
 # APP UTILS
 
 def check_admin(id):
@@ -752,38 +738,79 @@ def contact():
         name = request.form.get('name')
         email = request.form.get('email')
         message = request.form.get('message')
+        department = request.form.get('department')
+        subject = request.form.get('subject')
         
-        user = get_current_user()
 
-        new_msg = SupportMessage(
+        new_msg = ContactMessage(
             name=name,
             email=email,
+            subject=subject,
             message=message,
-            user_id=user.id if user else None
+            status="Pending",
+            department=department,
+            created_at=datetime.utcnow() + timedelta(hours=DELTA),
+            is_read=False,
+            reply=None
         )
         db.session.add(new_msg)
         db.session.commit()
 
-        flash("Your message was transmitted successfully. An editor or support specialist will review it shortly.")
+        flash("Your message was transmitted successfully. An editor or support specialist will review it shortly.", "success")
         return redirect(url_for('contact'))
 
     return render_template("contact.html")
 
+@app.route("/newsletter-signup", methods=["GET", "POST"])
+def newsletter():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        marketing_optin = request.form.get("marketing_optin") is not None
+        recaptcha_verified = request.form.get("recaptcha_verified")
+
+        if not name or not email:
+            flash("Name and email address are required.", "error")
+            return redirect(url_for("newsletter"))
+
+        if recaptcha_verified != "true":
+            flash("Please verify that you are not a robot first.", "error")
+            return redirect(url_for("newsletter"))
+
+        existing_sub = Subscription.query.filter_by(email=email).first()
+        if existing_sub:
+            flash("This email address is already subscribed.", "error")
+            return redirect(url_for("newsletter"))
+
+        new_subscription = Subscription(
+            name=name,
+            email=email,
+            marketing_optin=marketing_optin
+        )
+        db.session.add(new_subscription)
+        db.session.commit()
+
+        flash("Success! You have been subscribed to the Tunu Journal Archive newsletter.", "success")
+        return redirect(url_for("home"))
+
+    return render_template("newsletter_signup.html")
 
 @app.route("/admin/messages", methods=['GET'])
 def admin_messages():
     if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_portal', error="Authorization required."))
-    messages = SupportMessage.query.order_by(SupportMessage.id.desc()).all()
+        flash("Authorization required.", "error")
+        return redirect(url_for('admin_portal'))
+    messages = ContactMessage.query.order_by(ContactMessage.id.desc()).all()
     return render_template("admin_messages.html", messages=messages)
 
 
 @app.route("/admin/messages/reply/<msg_id>", methods=['POST'])
 def admin_reply_message(msg_id):
     if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_portal', error="Authorization required."))
+        flash("Authorization required.", "error")
+        return redirect(url_for('admin_portal'))
     
-    msg = SupportMessage.query.get_or_404(msg_id)
+    msg = ContactMessage.query.get_or_404(msg_id)
     reply_text = request.form.get('reply')
 
     email_msg = Message(
@@ -797,7 +824,7 @@ def admin_reply_message(msg_id):
         msg.reply = reply_text
         msg.status = "Replied"
         db.session.commit()
-        flash("Reply message transmitted successfully via email.")
+        flash("Reply message transmitted successfully via email.", "success")
     except Exception as e:
         flash(f"Transmission failure over Flask-Mail routing: {str(e)}")
 
@@ -807,22 +834,24 @@ def admin_reply_message(msg_id):
 @app.route("/admin/messages/resolve/<int:msg_id>", methods=['POST'])
 def admin_resolve_message(msg_id):
     if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_portal', error="Authorization required."))
+        flash("Authorization required.", "error")
+        return redirect(url_for('admin_portal'))
     msg = ContactMessage.query.get_or_404(msg_id)
     msg.status = "Resolved"
     db.session.commit()
-    flash("Inquiry marked as Resolved.")
+    flash("Inquiry marked as Resolved.", "success")
     return redirect(url_for('admin_messages'))
 
 
 @app.route("/admin/messages/delete/<int:msg_id>", methods=['POST'])
 def admin_delete_message(msg_id):
     if not session.get('admin_logged_in'):
-        return redirect(url_for('admin_portal', error="Authorization required."))
+        flash("Authorization required.", "error")
+        return redirect(url_for('admin_portal'))
     msg = ContactMessage.query.get_or_404(msg_id)
     db.session.delete(msg)
     db.session.commit()
-    flash("Message record deleted successfully.")
+    flash("Message record deleted successfully.", "success")
     return redirect(url_for('admin_messages'))
 
 
@@ -1892,4 +1921,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    app.run(debug=True)
+    # app.run(debug=True)
