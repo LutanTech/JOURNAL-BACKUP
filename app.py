@@ -731,36 +731,6 @@ def about():
 def terms():
     return render_template('terms_of_use.html')
 
-
-@app.route("/contact-us", methods=['GET', 'POST'])
-def contact():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        message = request.form.get('message')
-        department = request.form.get('department')
-        subject = request.form.get('subject')
-        
-
-        new_msg = ContactMessage(
-            name=name,
-            email=email,
-            subject=subject,
-            message=message,
-            status="Pending",
-            department=department,
-            created_at=datetime.utcnow() + timedelta(hours=DELTA),
-            is_read=False,
-            reply=None
-        )
-        db.session.add(new_msg)
-        db.session.commit()
-
-        flash("Your message was transmitted successfully. An editor or support specialist will review it shortly.", "success")
-        return redirect(url_for('contact'))
-
-    return render_template("contact.html")
-
 @app.route("/newsletter-signup", methods=["GET", "POST"])
 def newsletter():
     if request.method == "POST":
@@ -794,6 +764,37 @@ def newsletter():
         return redirect(url_for("home"))
 
     return render_template("newsletter_signup.html")
+
+
+@app.route("/contact-us", methods=['GET', 'POST'])
+def contact():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        message = request.form.get('message')
+        department = request.form.get('department')
+        subject = request.form.get('subject')
+        
+
+        new_msg = ContactMessage(
+            name=name,
+            email=email,
+            subject=subject,
+            message=message,
+            status="Pending",
+            department=department,
+            created_at=datetime.utcnow() + timedelta(hours=DELTA),
+            is_read=False,
+            reply=None
+        )
+        db.session.add(new_msg)
+        db.session.commit()
+
+        flash("Your message was transmitted successfully. An editor or support specialist will review it shortly.", "success")
+        return redirect(url_for('contact'))
+
+    return render_template("contact.html")
+
 
 @app.route("/admin/messages", methods=['GET'])
 def admin_messages():
@@ -1881,6 +1882,7 @@ def admin_notify_single_user(user_id):
 # =========================================================================
 # Client Workspace JSON API Endpoints
 # =========================================================================
+
 
 @app.route('/api/notifications', methods=['GET'])
 def get_user_notifications():
