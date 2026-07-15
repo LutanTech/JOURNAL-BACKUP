@@ -389,7 +389,7 @@
                         <label style="display: block; font-family: sans-serif; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 6px; opacity: 0.8;">Manuscript File (PDF format exclusively)</label>
                         <input type="file" name="pdf" accept=".pdf" required style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--paper); color: var(--ink);">
                     </div>
-                    <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 12px 30px;">Transmit Manuscript Packet</button>
+                    <button type="submit" class="btn-submit" style="align-self: flex-start; padding: 12px 30px;">Submit Manuscript</button>
                 </form>
             </div>
         </div>
@@ -433,7 +433,7 @@
 <script>
     const quill = new Quill('#abstract-editor', {
         theme: 'snow',
-        placeholder: 'Maximum 250 words describing context, methodology, results, and scientific impacts...',
+        placeholder: 'Describe context, methodology, results and scientific impacts...',
         modules: {
             toolbar: [
                 ['bold', 'italic', 'underline'],

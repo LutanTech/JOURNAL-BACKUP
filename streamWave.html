@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kroma — Creative Stream Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #050508;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050508;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e1b4b;
+            border-radius: 99px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338ca;
+        }
+
+        .ambient-glow {
+            position: fixed;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(16,185,129,0.03) 70%, rgba(0,0,0,0) 100%);
+            top: -10vw;
+            right: -10vw;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(80px);
+        }
+
+        .ambient-glow-left {
+            position: fixed;
+            width: 40vw;
+            height: 40vw;
+            background: radial-gradient(circle, rgba(16,185,129,0.05) 0%, rgba(99,102,241,0.02) 70%, rgba(0,0,0,0) 100%);
+            bottom: -5vw;
+            left: -5vw;
+            z-index: -1;
+            pointer-events: none;
+            filter: blur(80px);
+        }
+
+        .glass-panel {
+            background: rgba(10, 10, 18, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Custom progress bar overrides to ensure elegant appearance */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #10b981;
+            cursor: pointer;
+            box-shadow: 0 0 10px #10b981;
+            transition: transform 0.1s ease;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col pb-12">
+
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-left"></div>
+
+    <header class="sticky top-0 z-50 glass-panel border-b border-white/5 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <div onclick="navigateTo('feed')" class="flex items-center gap-2.5 cursor-pointer group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-emerald-400 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-all duration-300">
+                    <div class="w-full h-full bg-[#050508] rounded-[10px] flex items-center justify-center">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-emerald-400 group-hover:text-white transition-colors"></i>
+                    </div>
+                </div>
+                <span class="text-xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400">KROMA</span>
+            </div>
+            
+            <nav class="hidden md:flex items-center gap-1.5 bg-white/5 p-1 rounded-xl border border-white/5">
+                <button onclick="navigateTo('feed')" id="tab-feed" class="nav-tab px-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-300 bg-white/10 text-white shadow-sm">
+                    Discover Feed
+                </button>
+                <button onclick="navigateTo('upload')" id="tab-upload" class="nav-tab px-4 py-2 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all duration-300 text-slate-400 hover:text-white">
+                    Submit Project
+                </button>
+            </nav>
+        </div>
+
+        <div class="flex-1 max-w-lg mx-6 hidden sm:block">
+            <div class="relative group">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-emerald-500 rounded-full opacity-0 group-focus-within:opacity-20 blur-md transition-all duration-500"></div>
+                <div class="relative flex items-center bg-white/5 border border-white/10 rounded-full overflow-hidden focus-within:border-indigo-500/50 transition-colors">
+                    <i data-lucide="search" class="w-4 h-4 ml-4 text-slate-500 group-focus-within:text-emerald-400 transition-colors"></i>
+                    <input 
+                        type="text" 
+                        id="search-bar" 
+                        placeholder="Explore cinematic feeds, soundscapes, digital art..." 
+                        class="w-full bg-transparent px-4 py-3 outline-none text-xs text-white placeholder-slate-500 font-medium"
+                        onkeyup="handleSearch(event)"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button onclick="navigateTo('upload')" class="relative group hidden sm:flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-indigo-600/20 transition-all duration-300 hover:-translate-y-0.5">
+                <i data-lucide="arrow-up-right" class="w-4 h-4 text-emerald-300 group-hover:rotate-45 transition-transform duration-300"></i>
+                <span>Publish</span>
+            </button>
+            
+            <div class="w-9 h-9 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-xs font-bold text-emerald-400 tracking-wider shadow-inner">
+                KM
+            </div>
+        </div>
+    </header>
+
+    <div id="toast-container" class="fixed top-24 right-6 z-50 flex flex-col gap-3"></div>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+
+        <!-- Discovery Feed Section -->
+        <section id="view-feed" class="space-y-8 animate-fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6">
+                <div>
+                    <h1 class="text-3xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-400">Curated Showcases</h1>
+                    <p class="text-slate-400 text-sm mt-1">Immersive video experiences, curated by a global creative community.</p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex bg-white/5 p-1 rounded-xl border border-white/5 text-xs font-semibold">
+                        <button onclick="filterCategory('all')" class="cat-btn px-4 py-1.5 rounded-lg text-white bg-indigo-600 transition-all">All Projects</button>
+                        <button onclick="filterCategory('motion')" class="cat-btn px-4 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">Motion Design</button>
+                        <button onclick="filterCategory('soundscape')" class="cat-btn px-4 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">Soundscapes</button>
+                        <button onclick="filterCategory('visualart')" class="cat-btn px-4 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">Visual Art</button>
+                    </div>
+
+                    <select id="sort-select" onchange="sortVideos()" class="bg-[#0c0c14]/90 border border-white/10 text-xs text-slate-300 rounded-xl px-4 py-2.5 font-bold outline-none cursor-pointer focus:border-indigo-500 transition-colors">
+                        <option value="newest">Freshly Dropped</option>
+                        <option value="popular">High Traffic</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Bento Video Grid -->
+            <div id="video-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+
+            <div id="empty-feed" class="hidden flex-col items-center justify-center py-24 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4 border border-white/5">
+                    <i data-lucide="eye-off" class="w-8 h-8 text-slate-500"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">No collections found</h3>
+                <p class="text-slate-400 text-sm max-w-sm mt-2">Adjust your parameters or lead the trend by submitting your own artistic creations.</p>
+            </div>
+        </section>
+
+        <section id="view-player" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Immersive Custom Player Wrapper with Custom Controls and Settings -->
+                <div class="relative group" id="kroma-player-wrapper">
+                    <div class="absolute -inset-1.5 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-emerald-500/20 rounded-2xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    <div class="relative aspect-video bg-[#030305] rounded-2xl overflow-hidden border border-white/10 shadow-2xl flex flex-col justify-end select-none">
+                        
+                        <!-- Core HTML5 Video Element (native controls disabled) -->
+                        <video id="main-video-player" playsinline class="w-full h-full object-cover pointer-events-none absolute inset-0 z-0">
+                        </video>
+
+                        <canvas id="generative-visualizer-canvas" class="hidden w-full h-full object-cover absolute inset-0 z-0 bg-[#070710]"></canvas>
+
+                        <!-- Error/Fallback Warning Strip -->
+                        <div id="visualizer-fallback-indicator" class="hidden absolute top-4 left-4 z-20 bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 px-3 py-1.5 rounded-lg flex items-center gap-2 text-[10px] uppercase tracking-wider text-emerald-400 font-bold shadow-md">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span>Local Stream Emulator Active</span>
+                        </div>
+
+                        <!-- Clickable Player Trigger Overly to Play/Pause on direct container click -->
+                        <div onclick="togglePlayPause()" class="absolute inset-0 z-10 cursor-pointer flex items-center justify-center">
+                            <!-- Big Play Indicator overlay -->
+                            <div id="center-play-button" class="w-16 h-16 rounded-full bg-black/60 border border-white/10 flex items-center justify-center opacity-0 scale-75 transition-all duration-300">
+                                <i data-lucide="play" class="w-8 h-8 text-white fill-white ml-1"></i>
+                            </div>
+                        </div>
+
+                        <div id="custom-subtitles-overlay" class="absolute bottom-16 left-1/2 -translate-x-1/2 w-11/12 max-w-2xl text-center z-20 pointer-events-none transition-all duration-200">
+                            <span id="subtitle-text-box" class="px-4 py-2.5 rounded-xl leading-relaxed text-sm font-semibold transition-all shadow-xl inline-block" style="background-color: rgba(10, 10, 18, 0.95); color: #10b981;">
+                                [Welcome to Kroma Stream]
+                            </span>
+                        </div>
+
+                        <div id="custom-controls-bar" class="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-4 pb-3 pt-8 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            
+                            <!-- Custom Progress Bar -->
+                            <div class="flex items-center gap-3">
+                                <span id="ctrl-current-time" class="text-[10px] text-slate-400 font-bold min-w-[35px]">00:00</span>
+                                <div class="flex-1 relative h-3 flex items-center group/timeline cursor-pointer" id="progress-timeline-track" onmousedown="startScrubbing(event)" onmousemove="updateHoverTime(event)" onmouseleave="hideHoverTime()">
+                                    <div class="absolute inset-y-1 left-0 right-0 bg-white/15 rounded-full overflow-hidden">
+                                        <!-- Buffered Progress -->
+                                        <div id="progress-buffered-bar" class="h-full w-0 bg-white/10 transition-all duration-200"></div>
+                                        <!-- Playhead Progress Fill -->
+                                        <div id="progress-current-bar" class="absolute inset-y-0 left-0 h-full w-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400"></div>
+                                    </div>
+                                    <!-- Scrubbing Pin -->
+                                    <div id="progress-scrubber-pin" class="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-emerald-400 rounded-full shadow-lg scale-0 group-hover/timeline:scale-100 transition-transform duration-200" style="left: 0%;"></div>
+                                    <!-- Hover Preview Bubble -->
+                                    <div id="progress-time-preview" class="hidden absolute bottom-5 -translate-x-1/2 bg-slate-900 border border-white/10 px-2 py-0.5 rounded text-[9px] font-extrabold text-white">00:00</div>
+                                </div>
+                                <span id="ctrl-duration-time" class="text-[10px] text-slate-400 font-bold min-w-[35px]">00:00</span>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <button onclick="togglePlayPause()" class="text-slate-300 hover:text-white transition-colors">
+                                        <i data-lucide="play" id="ctrl-play-icon" class="w-4 h-4 fill-current"></i>
+                                    </button>
+                                    
+                                    <!-- Custom Volume Slider Controls -->
+                                    <div class="flex items-center gap-2 group/volume">
+                                        <button onclick="toggleMute()" class="text-slate-300 hover:text-white transition-colors">
+                                            <i data-lucide="volume-2" id="ctrl-volume-icon" class="w-4 h-4"></i>
+                                        </button>
+                                        <input type="range" id="ctrl-volume-slider" min="0" max="1" step="0.05" value="0.8" oninput="changeVolume(this.value)" class="w-16 h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-emerald-400 outline-none">
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 relative">
+                                    <!-- CC Toggle button -->
+                                    <button id="ctrl-cc-toggle" onclick="toggleSubtitlesVisibility()" class="relative flex items-center justify-center p-1 rounded hover:bg-white/5 text-emerald-400 border border-emerald-500/20 bg-emerald-500/10 text-xs font-bold transition-all px-2 py-0.5">
+                                        CC ON
+                                    </button>
+
+                                    <!-- CC Settings Button (Cog) -->
+                                    <button onclick="toggleCCSettingsMenu(event)" class="text-slate-300 hover:text-white hover:rotate-45 transition-transform duration-300 relative">
+                                        <i data-lucide="settings" class="w-4 h-4"></i>
+                                    </button>
+
+                                    <!-- Fullscreen -->
+                                    <button onclick="toggleFullscreen()" class="text-slate-300 hover:text-white transition-colors">
+                                        <i data-lucide="maximize" class="w-4 h-4"></i>
+                                    </button>
+
+                                    <div id="cc-settings-popover" class="hidden absolute bottom-8 right-0 w-64 glass-panel border border-white/10 rounded-xl p-4 shadow-2xl z-50 text-xs space-y-4">
+                                        <h4 class="font-extrabold text-[10px] uppercase tracking-wider text-slate-300 border-b border-white/5 pb-2">Caption Customization</h4>
+                                        
+                                        <!-- Text Size Settings -->
+                                        <div class="space-y-1.5">
+                                            <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Font Scaling</label>
+                                            <div class="grid grid-cols-3 gap-1">
+                                                <button onclick="setCCSetting('size', '11px')" class="size-btn px-2 py-1 bg-white/5 rounded hover:bg-white/10 text-[10px] font-semibold">Small</button>
+                                                <button onclick="setCCSetting('size', '14px')" class="size-btn px-2 py-1 bg-indigo-600 rounded text-[10px] font-semibold text-white">Normal</button>
+                                                <button onclick="setCCSetting('size', '18px')" class="size-btn px-2 py-1 bg-white/5 rounded hover:bg-white/10 text-[10px] font-semibold">Large</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Text Color Options -->
+                                        <div class="space-y-1.5">
+                                            <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Palette Tint</label>
+                                            <div class="flex items-center gap-2">
+                                                <button onclick="setCCSetting('color', '#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 border border-white/10 flex items-center justify-center" title="Emerald"></button>
+                                                <button onclick="setCCSetting('color', '#ffffff')" class="w-6 h-6 rounded-full bg-white border border-white/10 flex items-center justify-center" title="White"></button>
+                                                <button onclick="setCCSetting('color', '#38bdf8')" class="w-6 h-6 rounded-full bg-sky-400 border border-white/10 flex items-center justify-center" title="Sky"></button>
+                                                <button onclick="setCCSetting('color', '#fbbf24')" class="w-6 h-6 rounded-full bg-amber-400 border border-white/10 flex items-center justify-center" title="Amber"></button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Background Opacity Options -->
+                                        <div class="space-y-1.5">
+                                            <label class="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Plate Opacity</label>
+                                            <div class="grid grid-cols-3 gap-1">
+                                                <button onclick="setCCSetting('opacity', '0')" class="opacity-btn px-2 py-1 bg-white/5 rounded hover:bg-white/10 text-[10px] font-semibold">0%</button>
+                                                <button onclick="setCCSetting('opacity', '0.5')" class="opacity-btn px-2 py-1 bg-white/5 rounded hover:bg-white/10 text-[10px] font-semibold">50%</button>
+                                                <button onclick="setCCSetting('opacity', '0.95')" class="opacity-btn px-2 py-1 bg-indigo-600 rounded text-[10px] font-semibold text-white">95%</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Info Block -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8 space-y-4">
+                    <div class="flex items-center gap-2">
+                        <span id="player-category" class="bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] uppercase font-extrabold tracking-wider px-3 py-1 rounded-md"></span>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div>
+                            <h1 id="player-title" class="text-2xl font-extrabold tracking-tight text-white leading-tight"></h1>
+                            <div class="flex items-center gap-3 text-xs text-slate-400 mt-2">
+                                <span id="player-author" class="font-bold text-slate-200"></span>
+                                <span>•</span>
+                                <span id="player-views"></span>
+                                <span>•</span>
+                                <span id="player-date"></span>
+                            </div>
+                        </div>
+
+                        <!-- Interaction Buttons -->
+                        <div class="flex items-center gap-2 shrink-0 flex-wrap">
+                            <div class="flex items-center bg-white/5 p-1 rounded-xl border border-white/5">
+                                <button onclick="handleLike()" class="flex items-center gap-2 hover:bg-white/5 text-xs font-bold px-4 py-2 rounded-lg transition-all text-slate-300">
+                                    <i data-lucide="star" id="like-icon" class="w-4 h-4 text-slate-400"></i>
+                                    <span id="player-likes" class="text-slate-200">0</span>
+                                </button>
+                                <div class="w-[1px] h-4 bg-white/10"></div>
+                                <button onclick="handleDislike()" class="flex items-center justify-center hover:bg-white/5 px-3 py-2 rounded-lg transition-all">
+                                    <i data-lucide="thumbs-down" id="dislike-icon" class="w-4 h-4 text-slate-400"></i>
+                                </button>
+                            </div>
+
+                            <button onclick="shareVideo()" class="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-xs font-bold px-4 py-2 rounded-xl border border-white/5 text-slate-300 transition-all">
+                                <i data-lucide="share" class="w-4 h-4"></i>
+                                <span>Link</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="h-[1px] bg-white/5 my-2"></div>
+
+                    <div class="space-y-2">
+                        <h4 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Description</h4>
+                        <p id="player-desc" class="text-slate-300 text-sm whitespace-pre-wrap leading-relaxed font-light"></p>
+                    </div>
+                </div>
+
+                <!-- Customized Dynamic Comments System -->
+                <div class="glass-panel rounded-2xl p-6 md:p-8 space-y-6">
+                    <h2 class="text-lg font-black tracking-tight">Interactive Stream (<span id="comment-count">0</span>)</h2>
+                    
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-indigo-500 flex items-center justify-center font-bold text-white text-xs shrink-0 shadow-lg">
+                            U
+                        </div>
+                        <div class="flex-1 space-y-3">
+                            <textarea 
+                                id="new-comment-input" 
+                                rows="2"
+                                placeholder="Express your design feedback or creative thoughts..." 
+                                class="w-full bg-white/5 border border-white/10 rounded-xl p-3 focus:border-indigo-500 focus:outline-none text-sm placeholder-slate-500 font-medium transition-colors resize-none"
+                            ></textarea>
+                            <div class="flex justify-end gap-2">
+                                <button onclick="clearComment()" class="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white rounded-lg transition-colors">Discard</button>
+                                <button onclick="submitComment()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shadow-lg shadow-indigo-600/10">Publish Comment</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="comments-list" class="space-y-6 pt-4 border-t border-white/5"></div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 pb-2">
+                    <div class="w-1.5 h-3 bg-emerald-400 rounded-full"></div>
+                    <h2 class="text-xs font-extrabold text-slate-400 uppercase tracking-widest">Interactive Queue</h2>
+                </div>
+                <div id="up-next-list" class="space-y-4"></div>
+            </div>
+        </section>
+
+        <section id="view-upload" class="hidden max-w-2xl mx-auto glass-panel border border-white/10 rounded-3xl p-6 md:p-8 space-y-6 animate-fade-in">
+            <div>
+                <h2 class="text-2xl font-black flex items-center gap-2 tracking-tight">
+                    <i data-lucide="cloud-lightning" class="text-emerald-400"></i>
+                    <span>Studio Uploader</span>
+                </h2>
+                <p class="text-slate-400 text-xs mt-1">Publish your video masterpieces. Our system processes files entirely locally and converts SRT subtitles on-the-fly.</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Dropzone Area -->
+                <div id="drop-zone" class="border-2 border-dashed border-white/10 hover:border-emerald-500/50 rounded-2xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all bg-white/[0.02] hover:bg-emerald-500/[0.02] group">
+                    <input type="file" id="video-file" accept="video/*" class="hidden" onchange="handleFileSelect(event)">
+                    <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i data-lucide="upload" class="w-6 h-6 text-slate-400 group-hover:text-emerald-400 transition-colors" id="upload-icon"></i>
+                    </div>
+                    <p class="text-sm font-semibold" id="upload-status">Drop creative files here, or browse local paths</p>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">Accepting MP4, WebM, or OGG format up to 500MB</p>
+                </div>
+
+                <!-- Preview container -->
+                <div id="upload-preview-container" class="hidden relative aspect-video w-full max-w-md mx-auto bg-black rounded-2xl overflow-hidden border border-white/10 shadow-xl group">
+                    <video id="upload-video-preview" class="w-full h-full object-cover"></video>
+                    <canvas id="thumbnail-canvas" class="hidden"></canvas>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-4">
+                        <p class="text-xs text-emerald-400 font-bold bg-black/60 px-2.5 py-1 rounded-md border border-emerald-500/30">Capture Engine Loaded</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Showcase Title</label>
+                        <input type="text" id="upload-title" placeholder="e.g. Neon Horizon Ep. 4" class="w-full bg-white/5 border border-white/10 rounded-xl p-3.5 text-xs text-white focus:border-indigo-500 focus:outline-none transition-colors">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Niche Stream</label>
+                        <select id="upload-category" class="w-full bg-[#0c0c14] border border-white/10 rounded-xl p-3.5 text-xs text-slate-300 focus:border-indigo-500 focus:outline-none transition-colors cursor-pointer">
+                            <option value="motion">Motion Design</option>
+                            <option value="soundscape">Soundscapes</option>
+                            <option value="visualart">Visual Art</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Associated Subtitles Upload (Accepts .srt and .vtt) -->
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <span>Associated Subtitles (.srt or .vtt - auto converted)</span>
+                    </label>
+                    <div class="relative flex items-center bg-white/5 border border-white/10 rounded-xl p-3.5 hover:border-indigo-500/30 transition-colors">
+                        <input type="file" id="subtitle-file" accept=".vtt,.srt" class="hidden" onchange="handleSubtitleSelect(event)">
+                        <button onclick="document.getElementById('subtitle-file').click()" class="bg-indigo-600/20 hover:bg-indigo-600/35 px-4 py-2 rounded-lg text-xs font-bold text-indigo-300 border border-indigo-500/20 transition-all shrink-0">
+                            Choose Subtitle File
+                        </button>
+                        <span id="subtitle-upload-status" class="text-xs text-slate-400 ml-4 truncate font-medium">Supports standard .srt and .vtt types</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">Concept Brief</label>
+                    <textarea id="upload-desc" rows="4" placeholder="Briefly describe the design approach, software configs, and story outline..." class="w-full bg-white/5 border border-white/10 rounded-xl p-3.5 text-xs text-white focus:border-indigo-500 focus:outline-none transition-colors resize-none"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-white/5">
+                    <button onclick="navigateTo('feed')" class="px-5 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-colors">Discard</button>
+                    <button onclick="publishVideo()" class="bg-gradient-to-r from-emerald-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 px-6 py-2.5 rounded-xl text-xs font-bold text-white uppercase tracking-wider transition-all duration-300 shadow-lg shadow-emerald-500/10">Deploy Stream</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Sample Subtitle tracks built as SRT structure to test dynamic translation engines
+        const sampleForestSrt = `1
+00:00:01,000 --> 00:00:05,500
+[Quiet ambient woodland breeze, birds chirping]
+
+2
+00:00:06,000 --> 00:00:10,500
+Voiceover: Deep within the green heart of the untouched range...
+
+3
+00:00:11,000 --> 00:00:15,500
+...lies a sanctuary where golden beams of sunlight emerge.
+
+4
+00:00:16,000 --> 00:00:20,500
+Feel the tranquility. Connect directly with natural frequencies.`;
+
+        const sampleTechSrt = `1
+00:00:01,000 --> 00:00:04,500
+[Modern downtempo synthwave track starts playing]
+
+2
+00:00:05,000 --> 00:00:09,500
+Presenter: Today we style a highly cohesive desktop layout workspace.
+
+3
+00:00:10,000 --> 00:00:13,500
+Focusing heavily on cable containment and symmetry.
+
+4
+00:00:14,000 --> 00:00:18,500
+Enjoy the fluid visual feedback.`;
+
+        const sampleChampionshipSrt = `1
+00:00:01,000 --> 00:00:04,000
+[Intense mechanical gaming actions and cheering spectators]
+
+2
+00:00:04,500 --> 00:00:09,500
+Analyst: Unbelievable parry and counter mechanism at final frame!
+
+3
+00:00:10,000 --> 00:00:13,000
+That victory locks in the championship bracket.`;
+
+        // Highly available CORS-safe public video streams
+        const initialVideos = [
+            {
+                id: 1,
+                title: "Cinematic Journey into the Forest",
+                desc: "Discover a journey deep into unknown forests filled with magnificent light beams, green scenery, and peaceful atmosphere. Ideal ambient background noise to study, relax, or read.",
+                views: 125430,
+                likes: 8520,
+                liked: false,
+                disliked: false,
+                date: "2 days ago",
+                author: "Nature Studio",
+                category: "motion",
+                // Mixing highly reliable test media URLs with CORS support
+                videoUrl: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+                thumbnailUrl: "https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&q=80&w=800",
+                rawSubtitles: sampleForestSrt,
+                comments: [
+                    { author: "Erick", text: "This looks absolutely beautiful!", date: "1 day ago" },
+                    { author: "Alice", text: "Truly relaxing. The colors are out of this world.", date: "12 hours ago" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Modern Minimalist PC Setup Build",
+                desc: "Walkthrough of building a complete clean, cables hidden, minimalist white gaming PC and custom matching desktop environment.",
+                views: 54100,
+                likes: 3120,
+                liked: false,
+                disliked: false,
+                date: "5 days ago",
+                author: "TechCraft",
+                category: "soundscape",
+                videoUrl: "https://vjs.zencdn.net/v/oceans.mp4",
+                thumbnailUrl: "https://images.unsplash.com/photo-1587831990711-23ca6441447b?auto=format&fit=crop&q=80&w=800",
+                rawSubtitles: sampleTechSrt,
+                comments: [
+                    { author: "David", text: "The cable management detail in this build is pure wizardry.", date: "4 days ago" }
+                ]
+            },
+            {
+                id: 3,
+                title: "Competitive Tournament Championship Highlights",
+                desc: "Top plays and historic moments from the finals matching series. Featuring legendary mechanics, clutch team saves, and flawless commentary.",
+                views: 924300,
+                likes: 74210,
+                liked: false,
+                disliked: false,
+                date: "1 week ago",
+                author: "Championship Gaming Hub",
+                category: "visualart",
+                videoUrl: "https://vjs.zencdn.net/v/oceans.mp4", // Shared fallback
+                thumbnailUrl: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800",
+                rawSubtitles: sampleChampionshipSrt,
+                comments: [
+                    { author: "Marcus", text: "The play at minute 3:40 was insane!", date: "6 days ago" }
+                ]
+            }
+        ];
+
+        let videos = [...initialVideos];
+        let currentVideo = null;
+        let activeCategory = 'all';
+        let currentSort = 'newest';
+        let activeView = 'feed';
+        let uploadedVideoBlobUrl = null;
+        let uploadedSubtitleText = null;
+        let generatedThumbnail = null;
+        
+        // Custom subtitle system variables
+        let parsedSubtitles = [];
+        let subtitlesEnabled = true;
+        let ccSettings = {
+            size: '14px',
+            color: '#10b981',
+            opacity: '0.95'
+        };
+
+        let isVisualizerActive = false;
+        let visualizerAnimFrame = null;
+        let visualizerTime = 0;
+        let visualizerSpeed = 0.05;
+
+        // Interactive playback tracking states
+        let isPlaying = false;
+        let isScrubbing = false;
+
+        function initApp() {
+            lucide.createIcons();
+            renderFeed();
+            setupDropZone();
+            setupCustomPlayer();
+            
+            // Global click capture to automatically close customization popovers
+            window.addEventListener('click', (e) => {
+                const popover = document.getElementById('cc-settings-popover');
+                if (popover && !popover.classList.contains('hidden') && !e.target.closest('#cc-settings-popover') && !e.target.closest('button[onclick="toggleCCSettingsMenu(event)"]')) {
+                    popover.classList.add('hidden');
+                }
+            });
+        }
+
+        function parseSrtOrVtt(text) {
+            if (!text) return [];
+            
+            // Normalize potential line breaks (Windows / Unix compatibility)
+            const cleanText = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const lines = cleanText.split('\n');
+            const items = [];
+            let current = null;
+
+            // Simple timestamp matching regex to extract timestamps from line streams
+            const timestampRegex = /(\d{2}):(\d{2}):(\d{2})[.,](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[.,](\d{3})/;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const match = timestampRegex.exec(line);
+                if (match) {
+                    const startSecs = parseInt(match[1]) * 3600 + parseInt(match[2]) * 60 + parseInt(match[3]) + parseInt(match[4]) / 1000;
+                    const endSecs = parseInt(match[5]) * 3600 + parseInt(match[6]) * 60 + parseInt(match[7]) + parseInt(match[8]) / 1000;
+                    current = { start: startSecs, end: endSecs, textLines: [] };
+                    items.push(current);
+                } else if (current && isNaN(line) && line !== 'WEBVTT') {
+                    current.textLines.push(line);
+                }
+            }
+
+            // Clean, format, and assemble final subtitle entities
+            items.forEach(item => {
+                item.text = item.textLines.join('<br>');
+            });
+
+            return items;
+        }
+
+        function renderFeed(filteredList = null) {
+            const grid = document.getElementById('video-grid');
+            const emptyState = document.getElementById('empty-feed');
+            let list = filteredList || videos;
+
+            if (activeCategory !== 'all') {
+                list = list.filter(v => v.category === activeCategory);
+            }
+
+            if (list.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            emptyState.classList.remove('flex');
+
+            grid.innerHTML = list.map(v => `
+                <div class="glass-panel group rounded-2xl overflow-hidden cursor-pointer flex flex-col hover:border-indigo-500/25 hover:translate-y-[-4px] transition-all duration-300" onclick="playVideo(${v.id})">
+                    <div class="aspect-video w-full bg-[#030305] overflow-hidden relative border-b border-white/5">
+                        <img src="${v.thumbnailUrl}" alt="${v.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-[10px] text-slate-200 font-extrabold px-2 py-1 rounded tracking-wider border border-white/5 flex items-center gap-1">
+                            <span>${v.category.toUpperCase()}</span>
+                            <span class="text-emerald-400 ml-1 bg-emerald-500/10 px-1 py-0.2 rounded text-[8px] border border-emerald-500/20 font-bold">CC NATIVE</span>
+                        </div>
+                    </div>
+                    <div class="p-5 flex gap-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center font-black text-xs shrink-0 text-indigo-400">
+                            ${v.author[0]}
+                        </div>
+                        <div class="flex flex-col gap-1 overflow-hidden">
+                            <h3 class="font-bold text-sm text-slate-100 group-hover:text-emerald-400 line-clamp-1 transition-colors leading-tight">${v.title}</h3>
+                            <div class="text-[11px] text-slate-400 mt-1">
+                                <p class="hover:text-white transition-colors">${v.author}</p>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span>${formatViews(v.views)} streams</span>
+                                    <span>•</span>
+                                    <span>${v.date}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupCustomPlayer() {
+            const player = document.getElementById('main-video-player');
+            const visualizerCanvas = document.getElementById('generative-visualizer-canvas');
+            
+            // Video element state listeners
+            player.addEventListener('timeupdate', onPlayerTimeUpdate);
+            player.addEventListener('progress', onPlayerProgress);
+            player.addEventListener('loadedmetadata', () => {
+                document.getElementById('ctrl-duration-time').innerText = formatTime(player.duration);
+            });
+            player.addEventListener('ended', () => {
+                setPlayState(false);
+            });
+
+            // Handle potential loading failures gracefully (CORS, offline, blocked)
+            player.addEventListener('error', (e) => {
+                activateGenerativeFallbackStream();
+            });
+
+            // Prevent canvas and standard controls layout right-click conflict
+            visualizerCanvas.addEventListener('contextmenu', e => e.preventDefault());
+        }
+
+        function activateGenerativeFallbackStream() {
+            const player = document.getElementById('main-video-player');
+            const visualizerCanvas = document.getElementById('generative-visualizer-canvas');
+            const fallbackBadge = document.getElementById('visualizer-fallback-indicator');
+
+            // Pause actual player to prevent endless error loops
+            player.pause();
+            
+            // Transition visible components
+            visualizerCanvas.classList.remove('hidden');
+            fallbackBadge.classList.remove('hidden');
+
+            isVisualizerActive = true;
+            document.getElementById('ctrl-duration-time').innerText = "03:45"; // Simulated visual showcase duration
+            
+            // Start Canvas animation loop
+            if (!visualizerAnimFrame) {
+                runVisualizerLoop();
+            }
+            
+            showToast("Video source offline/restricted. Activating Local Generative Visualizer.");
+        }
+
+        function deactivateGenerativeFallbackStream() {
+            const visualizerCanvas = document.getElementById('generative-visualizer-canvas');
+            const fallbackBadge = document.getElementById('visualizer-fallback-indicator');
+
+            visualizerCanvas.classList.add('hidden');
+            fallbackBadge.classList.add('hidden');
+            isVisualizerActive = false;
+            
+            if (visualizerAnimFrame) {
+                cancelAnimationFrame(visualizerAnimFrame);
+                visualizerAnimFrame = null;
+            }
+        }
+
+        function runVisualizerLoop() {
+            if (!isVisualizerActive) return;
+
+            const canvas = document.getElementById('generative-visualizer-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Resize canvas dynamically to match container viewport
+            const rect = canvas.parentNode.getBoundingClientRect();
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+
+            // Simulate progress timing updates if visualizer is currently "playing"
+            if (isPlaying) {
+                visualizerTime += (1 / 60); // Increment virtual clock (approx. 60fps)
+                
+                // End loop once reaches end of simulation
+                if (visualizerTime >= 225) { // 3 min 45 secs limit
+                    visualizerTime = 0;
+                    setPlayState(false);
+                }
+
+                // Push visual progress bar updates manually
+                const simulatedPercent = (visualizerTime / 225) * 100;
+                document.getElementById('progress-current-bar').style.width = `${simulatedPercent}%`;
+                document.getElementById('progress-scrubber-pin').style.left = `${simulatedPercent}%`;
+                document.getElementById('ctrl-current-time').innerText = formatTime(visualizerTime);
+
+                // Run customized subtitle synchronization based on current simulated time
+                renderSubtitlesAtTime(visualizerTime);
+            }
+
+            // Clean slate canvas redraws
+            ctx.fillStyle = '#06060c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw abstract mathematical background matrices
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.45;
+
+            // Draw rotating galaxy spiral lines
+            ctx.lineWidth = 1.5;
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * Math.PI / 30) + (visualizerTime * 0.15);
+                const r = maxRadius * (0.3 + 0.7 * Math.sin((visualizerTime * 0.5) + (i * 0.1)));
+                
+                ctx.beginPath();
+                ctx.strokeStyle = `hsla(${(i * 6 + visualizerTime * 20) % 360}, 75%, 60%, 0.15)`;
+                ctx.moveTo(centerX, centerY);
+                
+                const c1X = centerX + Math.cos(angle - 0.4) * r * 0.5;
+                const c1Y = centerY + Math.sin(angle - 0.4) * r * 0.5;
+                const endX = centerX + Math.cos(angle) * r;
+                const endY = centerY + Math.sin(angle) * r;
+
+                ctx.quadraticCurveTo(c1X, c1Y, endX, endY);
+                ctx.stroke();
+            }
+
+            // Draw futuristic outer geometric rings
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, maxRadius * 0.8, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, maxRadius * 0.82, (visualizerTime * 0.5), (visualizerTime * 0.5) + Math.PI * 0.6);
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Render center floating focal star
+            const pulsingRadius = 15 + 5 * Math.sin(visualizerTime * 5);
+            const gradient = ctx.createRadialGradient(centerX, centerY, 1, centerX, centerY, pulsingRadius * 2);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 1)');
+            gradient.addColorStop(0.3, 'rgba(16, 185, 129, 0.4)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, pulsingRadius * 2, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            visualizerAnimFrame = requestAnimationFrame(runVisualizerLoop);
+        }
+
+        function playVideo(id) {
+            currentVideo = videos.find(v => v.id === id);
+            if (!currentVideo) return;
+
+            currentVideo.views++;
+            navigateTo('player');
+
+            // Deactivate and reset any fallback simulators
+            deactivateGenerativeFallbackStream();
+            visualizerTime = 0;
+
+            // Load Subtitles metadata associated with project
+            parsedSubtitles = parseSrtOrVtt(currentVideo.rawSubtitles);
+            applyCCSettings();
+
+            const player = document.getElementById('main-video-player');
+            player.src = currentVideo.videoUrl;
+            player.load();
+
+            // Set play state immediately to initiate loading cycles
+            setPlayState(true);
+
+            document.getElementById('player-title').innerText = currentVideo.title;
+            document.getElementById('player-author').innerText = currentVideo.author;
+            document.getElementById('player-desc').innerText = currentVideo.desc;
+            document.getElementById('player-views').innerText = `${formatViews(currentVideo.views)} streams`;
+            document.getElementById('player-date').innerText = currentVideo.date;
+            document.getElementById('player-likes').innerText = formatViews(currentVideo.likes);
+            
+            const catBadge = document.getElementById('player-category');
+            catBadge.innerText = currentVideo.category;
+
+            updateLikeDislikeUI();
+            renderComments();
+            renderUpNext();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function togglePlayPause() {
+            setPlayState(!isPlaying);
+        }
+
+        function setPlayState(play) {
+            isPlaying = play;
+            const player = document.getElementById('main-video-player');
+            const playIcon = document.getElementById('ctrl-play-icon');
+            const centerBtn = document.getElementById('center-play-button');
+
+            if (isPlaying) {
+                // Update icons and visualizer loops
+                playIcon.setAttribute('data-lucide', 'pause');
+                
+                if (isVisualizerActive) {
+                    // Running fallback loop triggers automatically
+                } else {
+                    player.play().catch(err => {
+                        // Browser automatic blocking policies triggered or offline, initiate visualizer fallback
+                        activateGenerativeFallbackStream();
+                    });
+                }
+
+                // Brief pop animation
+                centerBtn.innerHTML = '<i data-lucide="pause" class="w-8 h-8 text-white fill-white"></i>';
+            } else {
+                playIcon.setAttribute('data-lucide', 'play');
+                
+                if (!isVisualizerActive) {
+                    player.pause();
+                }
+
+                centerBtn.innerHTML = '<i data-lucide="play" class="w-8 h-8 text-white fill-white ml-1"></i>';
+            }
+
+            lucide.createIcons();
+
+            // Trigger quick click visual indication feedback on the layout screen
+            centerBtn.classList.remove('opacity-0', 'scale-75');
+            centerBtn.classList.add('opacity-100', 'scale-100');
+            setTimeout(() => {
+                centerBtn.classList.add('opacity-0', 'scale-75');
+                centerBtn.classList.remove('opacity-100', 'scale-100');
+            }, 500);
+        }
+
+        function onPlayerTimeUpdate() {
+            if (isScrubbing || isVisualizerActive) return;
+
+            const player = document.getElementById('main-video-player');
+            if (isNaN(player.duration)) return;
+
+            const percent = (player.currentTime / player.duration) * 100;
+            document.getElementById('progress-current-bar').style.width = `${percent}%`;
+            document.getElementById('progress-scrubber-pin').style.left = `${percent}%`;
+            document.getElementById('ctrl-current-time').innerText = formatTime(player.currentTime);
+
+            // Execute custom HTML subtitles tracking overlay
+            renderSubtitlesAtTime(player.currentTime);
+        }
+
+        function onPlayerProgress() {
+            const player = document.getElementById('main-video-player');
+            if (player.buffered.length > 0 && player.duration) {
+                const bufferedEnd = player.buffered.end(player.buffered.length - 1);
+                const percent = (bufferedEnd / player.duration) * 100;
+                document.getElementById('progress-buffered-bar').style.width = `${percent}%`;
+            }
+        }
+
+        function renderSubtitlesAtTime(time) {
+            const box = document.getElementById('subtitle-text-box');
+            const wrapper = document.getElementById('custom-subtitles-overlay');
+
+            if (!subtitlesEnabled || parsedSubtitles.length === 0) {
+                wrapper.classList.add('opacity-0');
+                return;
+            }
+
+            // Pinpoint the active phrase index based on exact playback millisecond bounds
+            const activeSub = parsedSubtitles.find(s => time >= s.start && time <= s.end);
+
+            if (activeSub) {
+                box.innerHTML = activeSub.text;
+                wrapper.classList.remove('opacity-0');
+            } else {
+                wrapper.classList.add('opacity-0');
+            }
+        }
+
+        function startScrubbing(e) {
+            isScrubbing = true;
+            seekTimeline(e);
+
+            // Setup global movement listeners to capture continuous seek drags
+            window.addEventListener('mousemove', seekTimeline);
+            window.addEventListener('mouseup', stopScrubbing);
+        }
+
+        function seekTimeline(e) {
+            const track = document.getElementById('progress-timeline-track');
+            const rect = track.getBoundingClientRect();
+            let relativeX = e.clientX - rect.left;
+            
+            // Constrain coordinates securely
+            if (relativeX < 0) relativeX = 0;
+            if (relativeX > rect.width) relativeX = rect.width;
+
+            const percentage = relativeX / rect.width;
+            const percentageClamped = percentage * 100;
+
+            document.getElementById('progress-current-bar').style.width = `${percentageClamped}%`;
+            document.getElementById('progress-scrubber-pin').style.left = `${percentageClamped}%`;
+
+            const totalDuration = isVisualizerActive ? 225 : document.getElementById('main-video-player').duration;
+            if (!isNaN(totalDuration)) {
+                const seekTarget = percentage * totalDuration;
+                document.getElementById('ctrl-current-time').innerText = formatTime(seekTarget);
+                
+                if (!isVisualizerActive) {
+                    document.getElementById('main-video-player').currentTime = seekTarget;
+                } else {
+                    visualizerTime = seekTarget;
+                }
+                
+                // Immediately synchronize subtitles on drag scrub transitions
+                renderSubtitlesAtTime(seekTarget);
+            }
+        }
+
+        function stopScrubbing() {
+            isScrubbing = false;
+            window.removeEventListener('mousemove', seekTimeline);
+            window.removeEventListener('mouseup', stopScrubbing);
+        }
+
+        function updateHoverTime(e) {
+            const track = document.getElementById('progress-timeline-track');
+            const preview = document.getElementById('progress-time-preview');
+            const rect = track.getBoundingClientRect();
+            let relativeX = e.clientX - rect.left;
+
+            if (relativeX < 0) relativeX = 0;
+            if (relativeX > rect.width) relativeX = rect.width;
+
+            const percentage = relativeX / rect.width;
+            const totalDuration = isVisualizerActive ? 225 : document.getElementById('main-video-player').duration;
+
+            if (!isNaN(totalDuration)) {
+                preview.innerText = formatTime(percentage * totalDuration);
+                preview.style.left = `${percentage * 100}%`;
+                preview.classList.remove('hidden');
+            }
+        }
+
+        function hideHoverTime() {
+            document.getElementById('progress-time-preview').classList.add('hidden');
+        }
+
+        function changeVolume(val) {
+            const player = document.getElementById('main-video-player');
+            player.volume = val;
+            
+            const icon = document.getElementById('ctrl-volume-icon');
+            if (val === "0" || player.muted) {
+                icon.setAttribute('data-lucide', 'volume-x');
+            } else if (val < 0.5) {
+                icon.setAttribute('data-lucide', 'volume-1');
+            } else {
+                icon.setAttribute('data-lucide', 'volume-2');
+            }
+            lucide.createIcons();
+        }
+
+        function toggleMute() {
+            const player = document.getElementById('main-video-player');
+            const slider = document.getElementById('ctrl-volume-slider');
+            
+            player.muted = !player.muted;
+            if (player.muted) {
+                slider.value = 0;
+                changeVolume(0);
+            } else {
+                slider.value = 0.8;
+                changeVolume(0.8);
+            }
+        }
+
+        function toggleSubtitlesVisibility() {
+            subtitlesEnabled = !subtitlesEnabled;
+            const btn = document.getElementById('ctrl-cc-toggle');
+
+            if (subtitlesEnabled) {
+                btn.innerText = "CC ON";
+                btn.className = "relative flex items-center justify-center p-1 rounded hover:bg-white/5 text-emerald-400 border border-emerald-500/20 bg-emerald-500/10 text-xs font-bold transition-all px-2 py-0.5";
+                showToast("Captions activated");
+            } else {
+                btn.innerText = "CC OFF";
+                btn.className = "relative flex items-center justify-center p-1 rounded hover:bg-white/5 text-slate-400 border border-white/5 bg-white/5 text-xs font-bold transition-all px-2 py-0.5";
+                showToast("Captions muted");
+            }
+        }
+
+        function toggleCCSettingsMenu(e) {
+            e.stopPropagation();
+            const popover = document.getElementById('cc-settings-popover');
+            popover.classList.toggle('hidden');
+        }
+
+        function setCCSetting(key, val) {
+            ccSettings[key] = val;
+            applyCCSettings();
+            showToast(`Captions layout updated`);
+        }
+
+        function applyCCSettings() {
+            const box = document.getElementById('subtitle-text-box');
+            if (!box) return;
+
+            // Apply size variables
+            box.style.fontSize = ccSettings.size;
+            
+            // Apply color variables
+            box.style.color = ccSettings.color;
+
+            // Apply glass plates opacity
+            box.style.backgroundColor = `rgba(10, 10, 18, ${ccSettings.opacity})`;
+
+            // Maintain styling borders based on customization settings
+            if (ccSettings.color === '#10b981') {
+                box.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+                box.style.borderWidth = '1px';
+            } else {
+                box.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                box.style.borderWidth = '1px';
+            }
+        }
+
+        function toggleFullscreen() {
+            const wrapper = document.getElementById('kroma-player-wrapper');
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        function navigateTo(target) {
+            activeView = target;
+            const views = ['feed', 'player', 'upload'];
+            
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('bg-white/10', 'text-white', 'shadow-sm');
+                btn.classList.add('text-slate-400', 'hover:text-white');
+            });
+
+            const activeTabBtn = document.getElementById(`tab-${target}`);
+            if (activeTabBtn) {
+                activeTabBtn.classList.remove('text-slate-400', 'hover:text-white');
+                activeTabBtn.classList.add('bg-white/10', 'text-white', 'shadow-sm');
+            }
+
+            const activeEl = document.getElementById(`view-${target}`);
+            if (activeEl) activeEl.classList.remove('hidden');
+
+            if (target !== 'player') {
+                setPlayState(false);
+                deactivateGenerativeFallbackStream();
+            }
+        }
+
+        function setupDropZone() {
+            const zone = document.getElementById('drop-zone');
+            
+            zone.addEventListener('click', () => {
+                document.getElementById('video-file').click();
+            });
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('border-emerald-500/50', 'bg-emerald-500/[0.03]');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('border-emerald-500/50', 'bg-emerald-500/[0.03]');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('border-emerald-500/50', 'bg-emerald-500/[0.03]');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processUploadedFile(files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                processUploadedFile(file);
+            }
+        }
+
+        function processUploadedFile(file) {
+            if (!file.type.startsWith('video/')) {
+                showToast("Only valid video streams are accepted.");
+                return;
+            }
+
+            uploadedVideoBlobUrl = URL.createObjectURL(file);
+            
+            const previewVideo = document.getElementById('upload-video-preview');
+            previewVideo.src = uploadedVideoBlobUrl;
+            previewVideo.load();
+            previewVideo.currentTime = 1;
+
+            document.getElementById('upload-title').value = file.name.split('.').slice(0, -1).join('.');
+            document.getElementById('drop-zone').classList.add('hidden');
+            document.getElementById('upload-preview-container').classList.remove('hidden');
+
+            previewVideo.addEventListener('loadeddata', () => {
+                generateThumbnailFromVideo(previewVideo);
+            });
+        }
+
+        function handleSubtitleSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const name = file.name.toLowerCase();
+            const isSrt = name.endsWith('.srt');
+            const isVtt = name.endsWith('.vtt');
+
+            if (!isSrt && !isVtt) {
+                showToast("Unsupported subtitle extension. Use .srt or .vtt.");
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                const textContent = event.target.result;
+                
+                // Keep raw loaded string. Parser converts formats automatically during playback cycles
+                uploadedSubtitleText = textContent;
+                
+                document.getElementById('subtitle-upload-status').innerText = `${file.name} (Compiled & Synced)`;
+                showToast("Subtitles synchronized!");
+            };
+
+            reader.onerror = function() {
+                showToast("Failed to compile subtitle metadata.");
+            };
+
+            reader.readAsText(file);
+        }
+
+        function generateThumbnailFromVideo(video) {
+            const canvas = document.getElementById('thumbnail-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = 640;
+            canvas.height = 360;
+            
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            generatedThumbnail = canvas.toDataURL('image/jpeg');
+        }
+
+        function publishVideo() {
+            const titleInput = document.getElementById('upload-title');
+            const descInput = document.getElementById('upload-desc');
+            const categorySelect = document.getElementById('upload-category');
+
+            const title = titleInput.value.trim();
+            const desc = descInput.value.trim() || "No brief config notes specified.";
+            const category = categorySelect.value;
+
+            if (!uploadedVideoBlobUrl || !title) {
+                showToast("Please provide both video stream file & title header.");
+                return;
+            }
+
+            const newId = videos.length + 1;
+            const newVideo = {
+                id: newId,
+                title: title,
+                desc: desc,
+                views: 1,
+                likes: 0,
+                liked: false,
+                disliked: false,
+                date: "Just now",
+                author: "Anonymous Creator",
+                category: category,
+                videoUrl: uploadedVideoBlobUrl,
+                thumbnailUrl: generatedThumbnail || "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800",
+                rawSubtitles: uploadedSubtitleText || "1\n00:00:01,000 --> 00:00:10,000\n[Welcome to your newly uploaded stream!]",
+                comments: []
+            };
+
+            videos.unshift(newVideo);
+            
+            // Clean inputs
+            titleInput.value = '';
+            descInput.value = '';
+            document.getElementById('drop-zone').classList.remove('hidden');
+            document.getElementById('upload-preview-container').classList.add('hidden');
+            document.getElementById('subtitle-upload-status').innerText = 'Supports standard .srt and .vtt types';
+            document.getElementById('subtitle-file').value = '';
+
+            uploadedVideoBlobUrl = null;
+            uploadedSubtitleText = null;
+            generatedThumbnail = null;
+
+            navigateTo('feed');
+            renderFeed();
+            showToast("Stream successfully built and published.");
+        }
+
+        function renderUpNext() {
+            const list = document.getElementById('up-next-list');
+            const filtered = videos.filter(v => v.id !== currentVideo.id);
+
+            list.innerHTML = filtered.map(v => `
+                <div class="glass-panel flex gap-3 p-3 cursor-pointer group rounded-xl hover:border-indigo-500/30 transition-all duration-300" onclick="playVideo(${v.id})">
+                    <div class="aspect-video w-24 bg-black rounded-lg overflow-hidden shrink-0 border border-white/5">
+                        <img src="${v.thumbnailUrl}" alt="${v.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <div class="flex flex-col gap-1 overflow-hidden justify-center">
+                        <h4 class="font-bold text-xs text-slate-200 group-hover:text-emerald-400 line-clamp-1 transition-colors leading-tight">${v.title}</h4>
+                        <p class="text-[10px] text-slate-400">${v.author}</p>
+                        <div class="flex items-center gap-1 text-[10px] text-slate-500">
+                            <span>${formatViews(v.views)} streams</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderComments() {
+            const list = document.getElementById('comments-list');
+            const count = document.getElementById('comment-count');
+            count.innerText = currentVideo.comments.length;
+
+            list.innerHTML = currentVideo.comments.map(c => `
+                <div class="flex gap-4 animate-fade-in">
+                    <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">
+                        ${c.author[0]}
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold text-slate-200">${c.author}</span>
+                            <span class="text-[10px] text-slate-500">${c.date}</span>
+                        </div>
+                        <p class="text-xs text-slate-300 leading-relaxed font-light">${c.text}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function submitComment() {
+            const input = document.getElementById('new-comment-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            currentVideo.comments.unshift({
+                author: "Anonymous Creator",
+                text: text,
+                date: "Just now"
+            });
+
+            input.value = '';
+            renderComments();
+            showToast("Comment successfully compiled!");
+        }
+
+        function clearComment() {
+            document.getElementById('new-comment-input').value = '';
+        }
+
+        function handleLike() {
+            if (currentVideo.liked) {
+                currentVideo.likes--;
+                currentVideo.liked = false;
+            } else {
+                currentVideo.likes++;
+                currentVideo.liked = true;
+                if (currentVideo.disliked) {
+                    currentVideo.disliked = false;
+                }
+            }
+            document.getElementById('player-likes').innerText = formatViews(currentVideo.likes);
+            updateLikeDislikeUI();
+        }
+
+        function handleDislike() {
+            if (currentVideo.disliked) {
+                currentVideo.disliked = false;
+            } else {
+                currentVideo.disliked = true;
+                if (currentVideo.liked) {
+                    currentVideo.likes--;
+                    currentVideo.liked = false;
+                }
+            }
+            document.getElementById('player-likes').innerText = formatViews(currentVideo.likes);
+            updateLikeDislikeUI();
+        }
+
+        function updateLikeDislikeUI() {
+            const likeIcon = document.getElementById('like-icon');
+            const dislikeIcon = document.getElementById('dislike-icon');
+
+            if (currentVideo.liked) {
+                likeIcon.classList.add('fill-emerald-400', 'text-emerald-400');
+                likeIcon.classList.remove('text-slate-400');
+            } else {
+                likeIcon.classList.remove('fill-emerald-400', 'text-emerald-400');
+                likeIcon.classList.add('text-slate-400');
+            }
+
+            if (currentVideo.disliked) {
+                dislikeIcon.classList.add('fill-indigo-400', 'text-indigo-400');
+                dislikeIcon.classList.remove('text-slate-400');
+            } else {
+                dislikeIcon.classList.remove('fill-indigo-400', 'text-indigo-400');
+                dislikeIcon.classList.add('text-slate-400');
+            }
+        }
+
+        function shareVideo() {
+            const dummy = document.createElement("textarea");
+            document.body.appendChild(dummy);
+            dummy.value = window.location.href + "?v=" + currentVideo.id;
+            dummy.select();
+            document.execCommand("copy");
+            document.body.removeChild(dummy);
+            showToast("Cinematic reference link copied to clipboard.");
+        }
+
+        function handleSearch(e) {
+            executeSearch();
+        }
+
+        function executeSearch() {
+            const query = document.getElementById('search-bar').value.toLowerCase().trim();
+            const filtered = videos.filter(v => 
+                v.title.toLowerCase().includes(query) || 
+                v.desc.toLowerCase().includes(query) || 
+                v.author.toLowerCase().includes(query)
+            );
+            
+            navigateTo('feed');
+            renderFeed(filtered);
+        }
+
+        function filterCategory(cat) {
+            activeCategory = cat;
+            
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('text-slate-400', 'hover:text-white');
+            });
+            
+            const activeBtn = Array.from(document.querySelectorAll('.cat-btn')).find(b => 
+                b.innerText.toLowerCase().includes(cat === 'visualart' ? 'visual' : cat === 'all' ? 'all' : cat)
+            );
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400', 'hover:text-white');
+                activeBtn.classList.add('bg-indigo-600', 'text-white');
+            }
+
+            navigateTo('feed');
+            renderFeed();
+        }
+
+        function sortVideos() {
+            currentSort = document.getElementById('sort-select').value;
+            if (currentSort === 'popular') {
+                videos.sort((a, b) => b.views - a.views);
+            } else {
+                videos.sort((a, b) => b.id - a.id);
+            }
+            renderFeed();
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "bg-[#0c0c14] text-slate-100 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-2 opacity-0 transition-all duration-300 text-xs font-semibold border border-white/5";
+            toast.innerHTML = `
+                <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3500);
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function formatViews(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num;
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>

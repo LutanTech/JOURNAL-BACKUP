@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Interrupted | Tunu Journal Archive</title>
+    <style>
+        /* CSS Reset & Variable Tokens representing Tunu's Scholarly Theme */
+        :root {
+            --gold: #b89047;
+            --gold-light: #f5eedf;
+            --stone-bg: #f7f5f0;
+            --card-bg: #ffffff;
+            --ink: #2b2b2a;
+            --ink-light: #6e6d6a;
+            --border: #e2e0db;
+            --online-green: #2e7d32;
+            --offline-red: #d32f2f;
+            --pending-orange: #f57c00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--stone-bg);
+            color: var(--ink);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Responsive Layout Container */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-family: "Georgia", "Baskerville", serif;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: var(--ink-light);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        /* Standard Card Components */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        /* Header Brand Design */
+        .header-brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-brand h1 {
+            font-size: 2.2rem;
+            color: var(--ink);
+            letter-spacing: -0.5px;
+        }
+
+        .header-brand span {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        /* Connection Status Panel */
+        .status-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            background: var(--stone-bg);
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--offline-red);
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .status-dot.online {
+            background-color: var(--online-green);
+        }
+
+        .status-dot.pending {
+            background-color: var(--pending-orange);
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+
+        /* Beautiful System Buttons */
+        .btn {
+            background-color: var(--gold);
+            color: #ffffff;
+            border: none;
+            padding: 12px 28px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(184, 144, 71, 0.2);
+        }
+
+        .btn:hover {
+            background-color: #a37d39;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            color: #888888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Two Column Grid layout */
+        .grid-split {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .grid-split {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Scratchpad Elements */
+        .scratchpad-container textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            resize: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background-color: var(--stone-bg);
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .scratchpad-container textarea:focus {
+            border-color: var(--gold);
+        }
+
+        .scratchpad-status {
+            text-align: right;
+            font-size: 0.75rem;
+            color: var(--ink-light);
+            margin-top: 5px;
+        }
+
+        /* Scholarly Trivia Mini-game Layout */
+        .trivia-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .trivia-question {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            min-height: 48px;
+        }
+
+        .trivia-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .trivia-btn {
+            background: var(--stone-bg);
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: left;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .trivia-btn:hover {
+            background: var(--gold-light);
+            border-color: var(--gold);
+        }
+
+        .trivia-feedback {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-height: 24px;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #333;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast-container.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Academic Brand Title -->
+        <div class="header-brand">
+            <span>Tunu Publisher Archive</span>
+            <h1>TUNU JOURNAL</h1>
+        </div>
+
+        <!-- Connection Diagnostics Module -->
+        <div class="card status-panel">
+            <div class="status-indicator">
+                <span class="status-dot" id="status-dot"></span>
+                <span id="status-text">Disconnected</span>
+            </div>
+            
+            <p style="max-width: 500px; margin-bottom: 25px;">
+                Our scholarly archives are temporarily out of range. Your work doesn't need to stop. We will automatically reload the application once your portal links back to the network.
+            </p>
+
+            <button onclick="tryReconnecting()" class="btn" id="reconnect-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+                <span id="btn-label">Check Connection Again</span>
+            </button>
+        </div>
+
+        <!-- Productivity and Mental Stimulation Row -->
+        <div class="grid-split">
+            
+            <!-- Workspace Scratchpad: Kept in LocalStorage -->
+            <div class="card scratchpad-container">
+                <h3>Scholarly Notes</h3>
+                <p>Jot down annotations or research draft ideas. They are stored safely locally on your machine while waiting.</p>
+                <textarea id="scratchpad" placeholder="Type thoughts here... Your inputs auto-save to local memory instantly."></textarea>
+                <div class="scratchpad-status" id="scratchpad-status">All changes saved locally</div>
+            </div>
+
+            <!-- Mini-Game: Scholarly Trivia -->
+            <div class="card trivia-container">
+                <div>
+                    <h3>Offline Mind-Sharpening</h3>
+                    <p>Test your academic history knowledge while we verify your system's connection.</p>
+                    <div class="trivia-question" id="trivia-question">Loading trivia challenge...</div>
+                </div>
+                <div>
+                    <div class="trivia-options" id="trivia-options">
+                        <!-- Instantiated by JS dynamically -->
+                    </div>
+                    <div class="trivia-feedback" id="trivia-feedback"></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Alert / Toast Popup Structure (Replaces forbidden alert calls) -->
+    <div id="toast" class="toast-container">
+        <span id="toast-text"></span>
+    </div>
+
+    <script>
+        
+        // Check sessionStorage safe bounds on load
+        if (sessionStorage.getItem('retries') === null) {
+            sessionStorage.setItem('retries', '0');
+        }
+
+        const maxRetries = 5;
+        let retryInterval = null;
+
+        // Perform an active, zero-cache, cross-origin ping check to an external global endpoint
+        async function checkActualConnection() {
+            // 1. If navigator.onLine is explicitly false, the computer is definitely offline
+            if (navigator.onLine === false) {
+                return false;
+            }
+
+            // 2. Perform a real cross-origin fetch request to a high-availability server
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5-second timeout
+
+                const response = await fetch('https://api.github.com?cache-bust=' + Date.now(), { 
+                    method: 'HEAD',
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                
+                // If the fetch succeeds, we have real, working public internet
+                return response.ok || (response.status >= 200 && response.status < 400);
+            } catch (error) {
+                // If DNS fails or connection drops, this catches it securely
+                return false;
+            }
+        }
+
+        async function updateConnectionStatus() {
+            const isOnline = await checkActualConnection();
+            const dot = document.getElementById('status-dot');
+            const txt = document.getElementById('status-text');
+            
+            if (isOnline) {
+                dot.className = 'status-dot online';
+                txt.textContent = 'Connection Restored! Restoring interface...';
+                sessionStorage.setItem('retries', '0');
+                showToast("Network verified! Restoring interface...");
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
+            } else {
+                dot.className = 'status-dot';
+                txt.textContent = 'Disconnected';
+            }
+        }
+
+        // Keep event-driven hooks alive
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        async function tryReconnecting() {
+            const btn = document.getElementById('reconnect-btn');
+            const btnLabel = document.getElementById('btn-label');
+            const txt = document.getElementById('status-text');
+            const dot = document.getElementById('status-dot');
+
+            // Prevent cumulative interval loops
+            if (retryInterval !== null) return;
+
+            // Reset loop counts if previous manual triggers hit the threshold
+            let currentRetries = parseInt(sessionStorage.getItem("retries"), 10) || 0;
+            if (currentRetries >= maxRetries) {
+                currentRetries = 0;
+                sessionStorage.setItem('retries', '0');
+            }
+
+            btn.disabled = true;
+            dot.className = 'status-dot pending';
+            txt.textContent = 'Verifying network availability...';
+
+            async function checkStep() {
+                currentRetries++;
+                sessionStorage.setItem('retries', currentRetries);
+                btnLabel.textContent = `Attempting Reconnect (${currentRetries}/${maxRetries})...`;
+
+                const isOnline = await checkActualConnection();
+                if (isOnline) {
+                    clearInterval(retryInterval);
+                    retryInterval = null;
+                    sessionStorage.setItem('retries', '0');
+                    btn.disabled = false;
+                    btnLabel.textContent = 'Check Connection Again';
+                    dot.className = 'status-dot online';
+                    txt.textContent = 'Connected! Redirecting...';
+                    showToast("Online status confirmed!");
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1000);
+                    return true;
+                }
+
+                if (currentRetries >= maxRetries) {
+                    clearInterval(retryInterval);
+                    retryInterval = null;
+                    btn.disabled = false;
+                    btnLabel.textContent = 'Check Connection Again';
+                    dot.className = 'status-dot';
+                    txt.textContent = 'Offline (5 attempts failed. Try again later)';
+                    showToast("System remained offline. Feel free to try again.");
+                    return true;
+                }
+                return false;
+            }
+
+            // Fire first step immediately
+            const finished = await checkStep();
+            if (!finished) {
+                retryInterval = setInterval(checkStep, 2000); // Poll systematically every 2 seconds
+            }
+        }
+
+        const scratchpad = document.getElementById('scratchpad');
+        const scratchpadStatus = document.getElementById('scratchpad-status');
+
+        if (localStorage.getItem('tunu_scratchpad')) {
+            scratchpad.value = localStorage.getItem('tunu_scratchpad');
+        }
+
+        scratchpad.addEventListener('input', () => {
+            scratchpadStatus.textContent = "Saving Draft...";
+            localStorage.setItem('tunu_scratchpad', scratchpad.value);
+            setTimeout(() => {
+                scratchpadStatus.textContent = "All changes saved locally";
+            }, 600);
+        });
+
+        const triviaPool = [
+            {
+                q: "Which library of antiquity is historically referred to as the largest intellectual archive of the ancient Mediterranean?",
+                a: ["The Great Library of Alexandria", "The Library of Ashurbanipal", "The Villa of the Papyri", "The Library of Pergamum"],
+                correct: 0
+            },
+            {
+                q: "What was the name of the world's first academic and scientific journal, established in 1665?",
+                a: ["Philosophical Transactions", "The Lancet", "Nature", "Journal des Sçavans"],
+                correct: 3
+            },
+            {
+                q: "Who is credited with creating the movable-type printing press system in Europe around 1440?",
+                a: ["Aldus Manutius", "Johannes Gutenberg", "William Caxton", "Nicolas Jenson"],
+                correct: 1
+            },
+            {
+                q: "The Dewey Decimal Classification system was invented in which century?",
+                a: ["17th Century", "18th Century", "19th Century", "20th Century"],
+                correct: 2
+            }
+        ];
+
+        let currentTriviaIndex = 0;
+
+        function renderTrivia() {
+            const questionElement = document.getElementById('trivia-question');
+            const optionsContainer = document.getElementById('trivia-options');
+            const feedbackElement = document.getElementById('trivia-feedback');
+
+            feedbackElement.textContent = "";
+            const currentItem = triviaPool[currentTriviaIndex];
+            questionElement.textContent = currentItem.q;
+            optionsContainer.innerHTML = "";
+
+            currentItem.a.forEach((option, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'trivia-btn';
+                btn.textContent = option;
+                btn.onclick = () => selectTriviaAnswer(idx);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectTriviaAnswer(selectedIdx) {
+            const currentItem = triviaPool[currentTriviaIndex];
+            const feedbackElement = document.getElementById('trivia-feedback');
+            const optionsContainer = document.getElementById('trivia-options');
+
+            const buttons = optionsContainer.getElementsByTagName('button');
+            for (let btn of buttons) {
+                btn.disabled = true;
+            }
+
+            if (selectedIdx === currentItem.correct) {
+                feedbackElement.style.color = "var(--online-green)";
+                feedbackElement.textContent = "Correct! Fascinating research insight.";
+            } else {
+                feedbackElement.style.color = "var(--offline-red)";
+                feedbackElement.textContent = `Incorrect. Correct answer: ${currentItem.a[currentItem.correct]}`;
+            }
+
+            setTimeout(() => {
+                currentTriviaIndex = (currentTriviaIndex + 1) % triviaPool.length;
+                renderTrivia();
+            }, 3000);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastText = document.getElementById('toast-text');
+            toastText.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+
+        window.onload = function() {
+            updateConnectionStatus();
+            renderTrivia();
+
+            const initialRetries = parseInt(sessionStorage.getItem('retries'), 10) || 0;
+            if (initialRetries >= maxRetries) {
+                const txt = document.getElementById('status-text');
+                txt.textContent = 'Offline (5 attempts failed. Try again later)';
+            }
+        };
+    </script>
+</body>
+</html>
